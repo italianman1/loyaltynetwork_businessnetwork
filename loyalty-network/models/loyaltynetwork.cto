@@ -32,19 +32,72 @@ participant Customer extends User {
 }
 
 participant LoyaltyProvider extends User{
-  o String providerName
-   --> LoyaltyPartner[] partners
+  o String companyName
+  --> LoyaltyPartner[] partners
+  --> Customer[] customers
 }
 
 participant LoyaltyPartner extends User{
-  o String partnerName
+  o String companyName
   --> LoyaltyProvider provider
 }
 
 asset LoyaltyToken identified by tokenId {
   o String tokenId
   --> User owner
-  o String value
+}
+
+transaction issueTokens{
+  --> User issuer
+  o Integer issuedTokens
+}
+
+transaction earnTokens{
+  --> Customer earner
+  o Integer earnedTokens
+  --> User issuer
+}
+
+transaction redeemTokens {
+  --> Customer redeemer
+  o Integer redeemdedTokens
+  --> User accepter
+}
+
+transaction tradeTokens {
+  --> Customer sender
+  --> Customer receiver
+  o Integer amountOfTokens
+}
+
+transaction joinProgram {
+  --> LoyaltyProvider programOwner
+  --> User joiner
+}
+
+transaction exitProgram {
+  --> LoyaltyProvider programOwner
+  --> User exiter
+}
+
+
+
+@commit(false)
+@returns(Customer[])
+transaction returnCustomersbyProvider {
+
+}
+
+@commit(false)
+@returns(LoyaltyProvider[])
+transaction returnLoyaltyProvidersByCustomer {
+
+}
+
+@commit(false)
+@returns(LoyaltyProvider[])
+transaction returnLoyaltyProvidersByPartner {
+
 }
 
 transaction SampleTransaction {
