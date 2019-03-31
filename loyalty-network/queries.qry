@@ -1,0 +1,69 @@
+/** Sample queries for Commodity Trading business network
+*/
+
+query selectAllCustomers {
+  description: "Select all customers"
+  statement:
+      SELECT loyaltynetwork.Customer
+}
+
+query selectAllPartners {
+  description: "Select all partners"
+  statement:
+      SELECT loyaltynetwork.LoyaltyPartner
+}
+
+query selectAllProviders {
+  description: "Select all providers"
+  statement:
+      SELECT loyaltynetwork.LoyaltyProvider
+}
+
+query selectCustomer {
+  description: "Select customer based on his id"
+  statement:
+      SELECT loyaltynetwork.Customer
+        WHERE (userId == _$id)
+}
+
+query selectPartner {
+  description: "Select partner based on their id"
+  statement:
+      SELECT loyaltynetwork.LoyaltyPartner
+        WHERE (userId == _$id)
+}
+
+query selectProvider{
+  description: "Select provider based on their id"
+  statement:
+      SELECT loyaltynetwork.LoyaltyProvider
+        WHERE (userId == _$id)
+}
+
+query selectPartnerByProvider{
+  description: "Select partner based on their provider"
+  statement:
+      SELECT loyaltynetwork.LoyaltyPartner
+        WHERE (provider == _$provider)
+}
+
+// query selectCommoditiesByExchange {
+//   description: "Select all commodities based on their main exchange"
+//   statement:
+//       SELECT org.example.mynetwork.Commodity
+//           WHERE (mainExchange==_$exchange)
+// }
+
+// query selectCommoditiesByOwner {
+//   description: "Select all commodities based on their owner"
+//   statement:
+//       SELECT org.example.mynetwork.Commodity
+//           WHERE (owner == _$owner)
+// }
+
+// query selectCommoditiesWithHighQuantity {
+//   description: "Select commodities based on quantity"
+//   statement:
+//       SELECT org.example.mynetwork.Commodity
+//           WHERE (quantity > 60)
+// }
