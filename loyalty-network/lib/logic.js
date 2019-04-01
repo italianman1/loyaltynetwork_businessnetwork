@@ -158,5 +158,3 @@ async function exitProgram(tx) {
 
 }
 
-
-

@@ -82,31 +82,20 @@ transaction exitProgram {
 
 
 
-@commit(false)
-@returns(Customer[])
-transaction returnCustomersbyProvider {
+// @commit(false)
+// @returns(Customer[])
+// transaction returnCustomersbyProvider {
 
-}
+// }
 
-@commit(false)
-@returns(LoyaltyProvider[])
-transaction returnLoyaltyProvidersByCustomer {
+// @commit(false)
+// @returns(LoyaltyProvider[])
+// transaction returnLoyaltyProvidersByCustomer {
 
-}
+// }
 
-@commit(false)
-@returns(LoyaltyProvider[])
-transaction returnLoyaltyProvidersByPartner {
+// @commit(false)
+// @returns(LoyaltyProvider[])
+// transaction returnLoyaltyProvidersByPartner {
 
-}
-
-transaction SampleTransaction {
-  --> LoyaltyToken asset
-  o String newValue
-}
-
-event SampleEvent {
-  --> LoyaltyToken asset
-  o String oldValue
-  o String newValue
-}
+// }
