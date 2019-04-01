@@ -47,6 +47,28 @@ query selectPartnerByProvider{
         WHERE (provider == _$provider)
 }
 
+query returnCustomersbyProvider {
+    description: "Select all customers who have a particular provider"
+    statement:
+        SELECT loyaltynetwork.Customer
+            WHERE (providers CONTAINS _$selected_provider)
+}
+
+query returnLoyaltyProvidersByCustomer {
+    description: "Select all providers who have a particular customer"
+    statement:
+        SELECT loyaltynetwork.LoyaltyProvider
+            WHERE (customers CONTAINS _$selected_customer)
+}
+
+
+query returnLoyaltyProvidersByPartner {
+    description: "Select all providers who have a particular partner"
+    statement:
+        SELECT loyaltynetwork.LoyaltyProvider
+            WHERE (partners CONTAINS _$selected_partner)
+}
+
 // query selectCommoditiesByExchange {
 //   description: "Select all commodities based on their main exchange"
 //   statement:
