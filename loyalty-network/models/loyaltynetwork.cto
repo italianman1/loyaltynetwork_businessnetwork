@@ -60,7 +60,7 @@ transaction earnTokens{
 
 transaction redeemTokens {
   --> Customer redeemer
-  o Integer redeemdedTokens
+  o Integer redeemedTokens
   --> User accepter
 }
 
@@ -80,7 +80,9 @@ transaction exitProgram {
   --> User exiter
 }
 
+transaction initiateNetwork{
 
+}
 
 // @commit(false)
 // @returns(Customer[])
