@@ -24,7 +24,7 @@
  */
 async function issueTokens(tx) {
 
-    var IssuedTokens = [];
+    var issuedTokens = [];
 
     let i;
 
@@ -34,7 +34,7 @@ async function issueTokens(tx) {
         var randomNumber = Math.floor((Math.random() * 100000) + 1);
         var token = await factory.newResource('loyaltynetwork', 'LoyaltyToken', 'Token' + randomNumber.toString());   
         token.owner = tx.issuer;
-        issuedTokens.add(token);
+        issuedTokens.push(token);
         await tokenAssetRegistry.add(token);
     }
 
@@ -56,17 +56,22 @@ async function issueTokens(tx) {
  * @transaction
  */
 async function earnTokens(tx) {
+    var earnedTokens = [];
+
+    let i; 
+
     for(i = 0; i< earnedTokens; i++){
         var token = tx.issuer.tokens.pop();
-        tx.earner.tokens.add(token);
         token.owner = tx.earner;
+        earnedTokens.push(token);
         const assetRegistry = await getAssetRegistry('loyaltynetwork.LoyaltyToken');
         await assetRegistry.update(token);
     }
 
-    const participantRegistry = await getParticipantRegistry('loyaltynetwork.Customer');
-    await participantRegistry.update(tx.earner);
-    await participantRegistry.update(tx.issuer);
+    tx.earner.tokens.push(earnedTokens);
+    const userRegistry = await getParticipantRegistry('loyaltynetwork.User');
+    await userRegistry.update(tx.earner);
+    await userRegistry.update(tx.issuer);
 
 }
 
@@ -76,17 +81,29 @@ async function earnTokens(tx) {
  * @transaction
  */
 async function redeemTokens(tx) {
-    for(i = 0; i< redeemedTokens; i++){
-        var token = tx.redeemer.tokens.pop();
-        tx.accepter.tokens.add(token);
-        token.owner = tx.accepter;
-        const assetRegistry = await getAssetRegistry('loyaltynetwork.LoyaltyToken');
-        await assetRegistry.update(token);
+    var redeemedTokens = [];
+
+    let i; 
+
+    if(tx.redeemer.tokens.length > tx.redeemedTokens){
+        for(i = 0; i< redeemedTokens; i++){
+            var token = tx.redeemer.tokens.pop();
+            token.owner = tx.accepter;
+            redeemedTokens.push(token);
+            const assetRegistry = await getAssetRegistry('loyaltynetwork.LoyaltyToken');
+            await assetRegistry.update(token);
+        }
+    
+        tx.accepter.tokens.push(redeemedTokens);
+        const userRegistry = await getParticipantRegistry('loyaltynetwork.User');
+        await userRegistry.update(tx.accepter);
+        await userRegistry.update(tx.redeemer);
     }
 
-    const participantRegistry = await getParticipantRegistry('loyaltynetwork.Customer');
-    await participantRegistry.update(tx.accepter);
-    await participantRegistry.update(tx.redeemer);
+    if(tx.redeemer.tokens.length < tx.redeemedTokens){
+        throw new Error('Insufficient tokens to redeem');
+    }
+   
 
 }
 
@@ -96,22 +113,35 @@ async function redeemTokens(tx) {
  * @transaction
  */
 async function tradeTokens(tx) {
-    for(i = 0; i< amountOfTokens; i++){
-        var token = tx.sender.tokens.pop();
-        tx.receiver.tokens.add(token);
-        token.owner = tx.receiver;                         
-        const assetRegistry = await getAssetRegistry('loyaltynetwork.LoyaltyToken');
-        await assetRegistry.update(token);
+
+    var tradedTokens = [];
+
+    let i; 
+
+    if(tx.sender.tokens.length > tx.amountOfTokens){
+        for(i = 0; i< amountOfTokens; i++){
+            var token = tx.sender.tokens.pop();
+            token.owner = tx.receiver;     
+            tradedTokens.push(token);
+            const assetRegistry = await getAssetRegistry('loyaltynetwork.LoyaltyToken');
+            await assetRegistry.update(token);
+        }
+
+        tx.receiver.tokens.push(tradedTokens);
+        const participantRegistry = await getParticipantRegistry('loyaltynetwork.Customer');
+        await participantRegistry.update(tx.sender);
+        await participantRegistry.update(tx.receiver);
     }
 
-    const participantRegistry = await getParticipantRegistry('loyaltynetwork.Customer');
-    await participantRegistry.update(tx.sender);
-    await participantRegistry.update(tx.receiver);
+    if(tx.sender.tokens.length < tx.amountOfTokens){
+        throw new Error('Insufficient tokens to trade');
+    }
+    
 
 }
 
 /**
- * A transaction when a customers wants to trade his/her tokens with another customer
+ * A transaction when a customers wants to join a loyalty program
  * @param {loyaltynetwork.joinProgram} joinProgram
  * @transaction
  */
@@ -135,7 +165,7 @@ async function joinProgram(tx) {
 }
 
 /**
- * A transaction when a customers wants to trade his/her tokens with another customer
+ * A transaction when a customers wants to exit a loyalty program
  * @param {loyaltynetwork.exitProgram} exitProgram
  * @transaction
  */
@@ -156,5 +186,65 @@ async function exitProgram(tx) {
         await participantRegistry.update(tx.programOwner);
     }
 
+}
+
+/**
+ * A transaction to initiate the network with some dummy data
+ * @param {loyaltynetwork.initiateNetwork} initiateNetwork
+ * @transaction
+ */
+async function initiateNetwork(tx) {
+    //retrieving registries and factories to create and add the different resources
+    const customerRegistry = await getParticipantRegistry('loyaltynetwork.Customer');
+    const partnerRegistry = await getParticipantRegistry('loyaltynetwork.LoyaltyPartner');
+    const providerRegistry = await getParticipantRegistry('loyaltynetwork.LoyaltyProvider');
+    const factory = getFactory();
+
+    //adding customers
+    var customer1 = factory.newResource('loyaltynetwork', 'Customer', 'Henk1');
+    customer1.firstName = "Henk";
+    customer1.lastName = "Sentjens";
+    customer1.providers = [];
+
+    var customer2 = factory.newResource('loyaltynetwork', 'Customer', 'Kees1');
+    customer2.firstName = "Kees";
+    customer2.lastName = "Boer";
+    customer2.providers = [];
+
+    var customer3 = factory.newResource('loyaltynetwork', 'Customer', 'Piet1');
+    customer3.firstName = "Piet";
+    customer3.lastName = "Oosterhout";
+    customer3.providers = [];
+
+    await customerRegistry.addAll([customer1, customer2, customer3]);
+    
+    //adding partners
+    var partner1 = factory.newResource('loyaltynetwork', 'LoyaltyPartner', 'Keeskroket1');
+    partner1.companyName = "Kees Kroket";
+    partner1.provider = ''
+
+    var partner2 = factory.newResource('loyaltynetwork', 'LoyaltyPartner', 'Hanscurryworst1');
+    partner2.companyName = "Hans Curryworst";
+
+    await partnerRegistry.addAll([partner1, partner2]);
+
+    //adding providers
+    var provider1 = factory.newResource('loyaltynetwork', 'LoyaltyProvider', 'Action0');
+    provider1.companyName = "Action";
+    provider1.partners = [];
+    provider1.customers = [customer1, customer2, customer3]
+
+    await providerRegistry.add(provider1);
+
+    //adding the provider to the customers and partners
+    partner1.provider = provider1;
+    partner2.provider = provider1;
+    customer1.providers = [provider1];
+    customer2.providers = [provider1];
+    customer3.providers = [provider1];
+
+    //updating customers and partners
+    await customerRegistry.updateAll([customer1, customer2, customer3]);
+    await partnerRegistry.updateAll([partner1, partner2]);
 }
 
