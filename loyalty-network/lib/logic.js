@@ -195,25 +195,39 @@ async function exitProgram(tx) {
  */
 async function initiateNetwork(tx) {
     //retrieving registries and factories to create and add the different resources
+    const tokenRegistry = await getAssetRegistry('loyaltynetwork.LoyaltyToken');
     const customerRegistry = await getParticipantRegistry('loyaltynetwork.Customer');
     const partnerRegistry = await getParticipantRegistry('loyaltynetwork.LoyaltyPartner');
     const providerRegistry = await getParticipantRegistry('loyaltynetwork.LoyaltyProvider');
     const factory = getFactory();
 
+    //adding tokens
+    var token1 = factory.newResource('loyaltynetwork', 'LoyaltyToken', 'Token1');
+    var token2 = factory.newResource('loyaltynetwork', 'LoyaltyToken', 'Token2');
+    var token3 = factory.newResource('loyaltynetwork', 'LoyaltyToken', 'Token3');
+    var token4 = factory.newResource('loyaltynetwork', 'LoyaltyToken', 'Token4');
+    var token5 = factory.newResource('loyaltynetwork', 'LoyaltyToken', 'Token5');
+
     //adding customers
     var customer1 = factory.newResource('loyaltynetwork', 'Customer', 'Henk1');
     customer1.firstName = "Henk";
     customer1.lastName = "Sentjens";
+    customer1.email = "henk@gmail.com"
+    customer1.tokens = [token3];
     customer1.providers = [];
 
     var customer2 = factory.newResource('loyaltynetwork', 'Customer', 'Kees1');
     customer2.firstName = "Kees";
     customer2.lastName = "Boer";
+    customer2.email = "kees.boer@gmail.com"
+    customer2.tokens = [token4];
     customer2.providers = [];
 
     var customer3 = factory.newResource('loyaltynetwork', 'Customer', 'Piet1');
     customer3.firstName = "Piet";
     customer3.lastName = "Oosterhout";
+    customer3.email = "piet@gmail.com"
+    customer3.tokens = [token5];
     customer3.providers = [];
 
     await customerRegistry.addAll([customer1, customer2, customer3]);
@@ -222,9 +236,13 @@ async function initiateNetwork(tx) {
     var partner1 = factory.newResource('loyaltynetwork', 'LoyaltyPartner', 'Keeskroket1');
     partner1.companyName = "Kees Kroket";
     partner1.provider = ''
+    partner1.email = "kees.kroket@gmail.com"
+    partner1.tokens = [token1];
 
     var partner2 = factory.newResource('loyaltynetwork', 'LoyaltyPartner', 'Hanscurryworst1');
     partner2.companyName = "Hans Curryworst";
+    partner2.email = "hans@gmail.com"
+    partner2.tokens = [token2];
 
     await partnerRegistry.addAll([partner1, partner2]);
 
@@ -233,6 +251,8 @@ async function initiateNetwork(tx) {
     provider1.companyName = "Action";
     provider1.partners = [];
     provider1.customers = [customer1, customer2, customer3]
+    provider1.email = "action@gmail.com"
+    provider1.tokens = [];
 
     await providerRegistry.add(provider1);
 
@@ -242,9 +262,17 @@ async function initiateNetwork(tx) {
     customer1.providers = [provider1];
     customer2.providers = [provider1];
     customer3.providers = [provider1];
+    token1.owner = partner1;
+    token2.owner = partner2;
+    token3.owner = customer1;
+    token4.owner = customer2;
+    token5.owner = customer3;
 
     //updating customers and partners
     await customerRegistry.updateAll([customer1, customer2, customer3]);
     await partnerRegistry.updateAll([partner1, partner2]);
+    await tokenRegistry.updateAll([token1, token2, token3, token4, token5]);
+
+ 
 }
 
