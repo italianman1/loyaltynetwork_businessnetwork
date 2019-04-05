@@ -230,8 +230,6 @@ async function initiateNetwork(tx) {
     customer3.role = "Customer";
     customer3.tokens = [];
     customer3.providers = [];
-
-    await customerRegistry.addAll([customer1, customer2, customer3]);
     
     //adding partners
     var partner1 = factory.newResource('loyaltynetwork', 'LoyaltyPartner', 'Keeskroket1');
@@ -239,16 +237,14 @@ async function initiateNetwork(tx) {
     partner1.email = "kees.kroket@gmail.com";
     partner1.role = "Partner";
     partner1.tokens = [];
-    partner1.provider = "none";
+    partner1.provider = provider1;
 
     var partner2 = factory.newResource('loyaltynetwork', 'LoyaltyPartner', 'Hanscurryworst1');
     partner2.companyName = "Hans Curryworst";
     partner2.email = "hans@gmail.com";
     partner2.role = "Partner";
     partner2.tokens = [];
-    partner2.provider = "none";
-
-    await partnerRegistry.addAll([partner1, partner2]);
+    partner2.provider = provider1;
 
     //adding providers
     var provider1 = factory.newResource('loyaltynetwork', 'LoyaltyProvider', 'Action0');
@@ -259,7 +255,6 @@ async function initiateNetwork(tx) {
     provider1.role = "Provider";
     provider1.tokens = [];
 
-    await providerRegistry.add(provider1);
 
     //adding the provider to the customers and partners
     partner1.provider = provider1;
@@ -279,10 +274,12 @@ async function initiateNetwork(tx) {
     customer3.tokens = [token5];
 
 
-    //updating customers and partners
-    await customerRegistry.updateAll([customer1, customer2, customer3]);
-    await partnerRegistry.updateAll([partner1, partner2]);
-    await tokenRegistry.updateAll([token1, token2, token3, token4, token5]);
+    //adding everything to the network
+    await customerRegistry.addAll([customer1, customer2, customer3]);
+    await partnerRegistry.addAll([partner1, partner2]);
+    await providerRegistry.add(provider1);
+    await tokenRegistry.addAll([token1, token2, token3, token4, token5]);
+
 
  
 }
