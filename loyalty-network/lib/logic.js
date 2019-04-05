@@ -136,8 +136,6 @@ async function tradeTokens(tx) {
     if(tx.sender.tokens.length < tx.amountOfTokens){
         throw new Error('Insufficient tokens to trade');
     }
-    
-
 }
 
 /**
@@ -241,14 +239,14 @@ async function initiateNetwork(tx) {
     partner1.email = "kees.kroket@gmail.com";
     partner1.role = "Partner";
     partner1.tokens = [];
-    partner1.provider = "";
+    partner1.provider = "none";
 
     var partner2 = factory.newResource('loyaltynetwork', 'LoyaltyPartner', 'Hanscurryworst1');
     partner2.companyName = "Hans Curryworst";
     partner2.email = "hans@gmail.com";
     partner2.role = "Partner";
     partner2.tokens = [];
-    partner2.provider = "";
+    partner2.provider = "none";
 
     await partnerRegistry.addAll([partner1, partner2]);
 
