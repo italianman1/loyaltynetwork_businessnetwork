@@ -212,22 +212,22 @@ async function initiateNetwork(tx) {
     var customer1 = factory.newResource('loyaltynetwork', 'Customer', 'Henk1');
     customer1.firstName = "Henk";
     customer1.lastName = "Sentjens";
-    customer1.email = "henk@gmail.com"
-    customer1.tokens = [token3];
+    customer1.email = "henk@gmail.com";
+    customer1.tokens = [];
     customer1.providers = [];
 
     var customer2 = factory.newResource('loyaltynetwork', 'Customer', 'Kees1');
     customer2.firstName = "Kees";
     customer2.lastName = "Boer";
-    customer2.email = "kees.boer@gmail.com"
-    customer2.tokens = [token4];
+    customer2.email = "kees.boer@gmail.com";
+    customer2.tokens = [];
     customer2.providers = [];
 
     var customer3 = factory.newResource('loyaltynetwork', 'Customer', 'Piet1');
     customer3.firstName = "Piet";
     customer3.lastName = "Oosterhout";
     customer3.email = "piet@gmail.com"
-    customer3.tokens = [token5];
+    customer3.tokens = [];
     customer3.providers = [];
 
     await customerRegistry.addAll([customer1, customer2, customer3]);
@@ -235,14 +235,13 @@ async function initiateNetwork(tx) {
     //adding partners
     var partner1 = factory.newResource('loyaltynetwork', 'LoyaltyPartner', 'Keeskroket1');
     partner1.companyName = "Kees Kroket";
-    partner1.provider = ''
-    partner1.email = "kees.kroket@gmail.com"
-    partner1.tokens = [token1];
+    partner1.email = "kees.kroket@gmail.com";
+    partner1.tokens = [];
 
     var partner2 = factory.newResource('loyaltynetwork', 'LoyaltyPartner', 'Hanscurryworst1');
     partner2.companyName = "Hans Curryworst";
-    partner2.email = "hans@gmail.com"
-    partner2.tokens = [token2];
+    partner2.email = "hans@gmail.com";
+    partner2.tokens = [];
 
     await partnerRegistry.addAll([partner1, partner2]);
 
@@ -251,7 +250,7 @@ async function initiateNetwork(tx) {
     provider1.companyName = "Action";
     provider1.partners = [];
     provider1.customers = [customer1, customer2, customer3]
-    provider1.email = "action@gmail.com"
+    provider1.email = "action@gmail.com";
     provider1.tokens = [];
 
     await providerRegistry.add(provider1);
@@ -267,6 +266,12 @@ async function initiateNetwork(tx) {
     token3.owner = customer1;
     token4.owner = customer2;
     token5.owner = customer3;
+    partner1.tokens = [token1];
+    partner2.tokens = [token2];
+    customer1.tokens = [token3];
+    customer2.tokens = [token4];
+    customer3.tokens = [token5];
+
 
     //updating customers and partners
     await customerRegistry.updateAll([customer1, customer2, customer3]);
