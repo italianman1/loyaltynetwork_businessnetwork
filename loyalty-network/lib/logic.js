@@ -213,6 +213,7 @@ async function initiateNetwork(tx) {
     customer1.firstName = "Henk";
     customer1.lastName = "Sentjens";
     customer1.email = "henk@gmail.com";
+    customer1.role = "Customer";
     customer1.tokens = [];
     customer1.providers = [];
 
@@ -220,6 +221,7 @@ async function initiateNetwork(tx) {
     customer2.firstName = "Kees";
     customer2.lastName = "Boer";
     customer2.email = "kees.boer@gmail.com";
+    customer2.role = "Customer";
     customer2.tokens = [];
     customer2.providers = [];
 
@@ -227,6 +229,7 @@ async function initiateNetwork(tx) {
     customer3.firstName = "Piet";
     customer3.lastName = "Oosterhout";
     customer3.email = "piet@gmail.com"
+    customer3.role = "Customer";
     customer3.tokens = [];
     customer3.providers = [];
 
@@ -236,11 +239,13 @@ async function initiateNetwork(tx) {
     var partner1 = factory.newResource('loyaltynetwork', 'LoyaltyPartner', 'Keeskroket1');
     partner1.companyName = "Kees Kroket";
     partner1.email = "kees.kroket@gmail.com";
+    partner1.role = "Partner";
     partner1.tokens = [];
 
     var partner2 = factory.newResource('loyaltynetwork', 'LoyaltyPartner', 'Hanscurryworst1');
     partner2.companyName = "Hans Curryworst";
     partner2.email = "hans@gmail.com";
+    partner2.role = "Partner";
     partner2.tokens = [];
 
     await partnerRegistry.addAll([partner1, partner2]);
@@ -251,6 +256,7 @@ async function initiateNetwork(tx) {
     provider1.partners = [];
     provider1.customers = [customer1, customer2, customer3]
     provider1.email = "action@gmail.com";
+    provider1.role = "Provider";
     provider1.tokens = [];
 
     await providerRegistry.add(provider1);
