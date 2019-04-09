@@ -69,6 +69,26 @@ query returnLoyaltyProvidersByPartner {
             WHERE (partners CONTAINS _$selected_partner)
 }
 
+query selectAllTransactions{
+    description: "Select all transaction within the network"
+    statement:
+        SELECT org.hyperledger.composer.system.HistorianRecord
+}
+
+query selectTransaction{
+    description: "Select one particular transaction"
+    statement:
+        SELECT org.hyperledger.composer.system.HistorianRecord
+          WHERE (transactionId == _$transaction_Id)
+}
+
+query selectAllIssuedTokenTransactions{
+    description: "Select all transactions where tokens where issued"
+    statement: 
+      SELECT loyaltynetwork.issueTokens
+}
+
+
 // query selectCommoditiesByExchange {
 //   description: "Select all commodities based on their main exchange"
 //   statement:

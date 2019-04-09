@@ -84,6 +84,13 @@ transaction initiateNetwork{
 
 }
 
+@commit(false)
+@returns(Integer)
+transaction returnIssuedTokensByProvider{
+  --> User issuer
+}
+
+
 // @commit(false)
 // @returns(Customer[])
 // transaction returnCustomersbyProvider {

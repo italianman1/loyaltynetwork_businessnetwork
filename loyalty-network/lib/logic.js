@@ -187,6 +187,27 @@ async function exitProgram(tx) {
 }
 
 /**
+ * A transaction when a customers wants to exit a loyalty program
+ * @param {loyaltynetwork.returnIssuedTokensByProvider} returnIssuedTokensByProvider
+ * @returns {Integer} 
+ * @transaction
+ */
+async function returnIssuedTokensByProvider(tx) {
+    var transactionArray = await query('selectAllIssuedTokenTransactions');
+    let totalIssuedTokens = 0;
+    let i;
+
+    for(i = 0; i < transactionArray.length; i++){
+        if(tx.issuer == transactionArray[i].issuer){
+            totalIssuedTokens += transactionArray[i].issuedTokens.length;
+        }
+    }
+
+    return totalIssuedTokens;
+
+}
+
+/**
  * A transaction to initiate the network with some dummy data
  * @param {loyaltynetwork.initiateNetwork} initiateNetwork
  * @transaction
@@ -280,7 +301,14 @@ async function initiateNetwork(tx) {
     await providerRegistry.add(provider1);
     await tokenRegistry.addAll([token1, token2, token3, token4, token5]);
 
+    await businessNetworkConnection.connect('admin@loyalty-network');
+    let result = await businessNetworkConnection.issueIdentity('loyaltynetwork.Customer#Henk1', 'henk1');
+    let result = await businessNetworkConnection.issueIdentity('loyaltynetwork.Customer#Kees1', 'kees1');
+    let result = await businessNetworkConnection.issueIdentity('loyaltynetwork.Customer#Piet1', 'piet1');
 
- 
+    let result = await businessNetworkConnection.issueIdentity('loyaltynetwork.LoyaltyPartner@Keeskroket1', 'keeskroket1');
+    let result = await businessNetworkConnection.issueIdentity('loyaltynetwork.LoyaltyPartner@Hanscurryworst1', 'Hanscurryworst1');
+
+    let result = await businessNetworkConnection.issueIdentity('loyaltynetwork.LoyaltyPartner@Action0', 'action0');
 }
 
