@@ -301,14 +301,15 @@ async function initiateNetwork(tx) {
     await providerRegistry.add(provider1);
     await tokenRegistry.addAll([token1, token2, token3, token4, token5]);
 
+    //issue identities
     await businessNetworkConnection.connect('admin@loyalty-network');
-    let result = await businessNetworkConnection.issueIdentity('loyaltynetwork.Customer#Henk1', 'henk1');
-    let result = await businessNetworkConnection.issueIdentity('loyaltynetwork.Customer#Kees1', 'kees1');
-    let result = await businessNetworkConnection.issueIdentity('loyaltynetwork.Customer#Piet1', 'piet1');
+    await businessNetworkConnection.issueIdentity('loyaltynetwork.Customer#Henk1', 'henk1');
+    await businessNetworkConnection.issueIdentity('loyaltynetwork.Customer#Kees1', 'kees1');
+    await businessNetworkConnection.issueIdentity('loyaltynetwork.Customer#Piet1', 'piet1');
 
-    let result = await businessNetworkConnection.issueIdentity('loyaltynetwork.LoyaltyPartner@Keeskroket1', 'keeskroket1');
-    let result = await businessNetworkConnection.issueIdentity('loyaltynetwork.LoyaltyPartner@Hanscurryworst1', 'Hanscurryworst1');
+    await businessNetworkConnection.issueIdentity('loyaltynetwork.LoyaltyPartner@Keeskroket1', 'keeskroket1');
+    await businessNetworkConnection.issueIdentity('loyaltynetwork.LoyaltyPartner@Hanscurryworst1', 'Hanscurryworst1');
 
-    let result = await businessNetworkConnection.issueIdentity('loyaltynetwork.LoyaltyPartner@Action0', 'action0');
+    await businessNetworkConnection.issueIdentity('loyaltynetwork.LoyaltyPartner@Action0', 'action0');
 }
 
