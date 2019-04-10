@@ -22,33 +22,33 @@ abstract participant User identified by userId {
   o String userId
   o String email
   o String role
-  --> LoyaltyToken[] tokens
+  --> LoyaltyToken[] tokens optional
 }
 
 participant Customer extends User {
   o String firstName
   o String lastName
-  --> LoyaltyProvider[] providers
+  --> LoyaltyProvider[] providers optional
 }
 
 participant LoyaltyProvider extends User{
   o String companyName
-  --> LoyaltyPartner[] partners
-  --> Customer[] customers
+  --> LoyaltyPartner[] partners optional
+  --> Customer[] customers optional
 }
 
 participant LoyaltyPartner extends User{
   o String companyName
-  --> LoyaltyProvider provider
+  --> LoyaltyProvider provider optional
 }
 
 asset LoyaltyToken identified by tokenId {
   o String tokenId
-  --> User owner
+  --> User owner 
 }
 
 transaction issueTokens{
-  --> User issuer
+  --> User issuer 
   o Integer issuedTokens
 }
 
