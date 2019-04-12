@@ -35,6 +35,7 @@ participant LoyaltyProvider extends User{
   o String companyName
   --> LoyaltyPartner[] partners optional
   --> Customer[] customers optional
+  o Integer conversionRate optional
 }
 
 participant LoyaltyPartner extends User{
