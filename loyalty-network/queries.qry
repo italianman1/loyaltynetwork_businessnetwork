@@ -1,0 +1,111 @@
+/** Sample queries for Commodity Trading business network
+*/
+
+query selectAllCustomers {
+  description: "Select all customers"
+  statement:
+      SELECT loyaltynetwork.Customer
+}
+
+query selectAllPartners {
+  description: "Select all partners"
+  statement:
+      SELECT loyaltynetwork.LoyaltyPartner
+}
+
+query selectAllProviders {
+  description: "Select all providers"
+  statement:
+      SELECT loyaltynetwork.LoyaltyProvider
+}
+
+query selectCustomer {
+  description: "Select customer based on his id"
+  statement:
+      SELECT loyaltynetwork.Customer
+        WHERE (userId == _$id)
+}
+
+query selectPartner {
+  description: "Select partner based on their id"
+  statement:
+      SELECT loyaltynetwork.LoyaltyPartner
+        WHERE (userId == _$id)
+}
+
+query selectProvider{
+  description: "Select provider based on their id"
+  statement:
+      SELECT loyaltynetwork.LoyaltyProvider
+        WHERE (userId == _$id)
+}
+
+query selectPartnerByProvider{
+  description: "Select partner based on their provider"
+  statement:
+      SELECT loyaltynetwork.LoyaltyPartner
+        WHERE (provider == _$provider)
+}
+
+query returnCustomersbyProvider {
+    description: "Select all customers who have a particular provider"
+    statement:
+        SELECT loyaltynetwork.Customer
+            WHERE (providers CONTAINS _$selected_provider)
+}
+
+query returnLoyaltyProvidersByCustomer {
+    description: "Select all providers who have a particular customer"
+    statement:
+        SELECT loyaltynetwork.LoyaltyProvider
+            WHERE (customers CONTAINS _$selected_customer)
+}
+
+
+query returnLoyaltyProvidersByPartner {
+    description: "Select all providers who have a particular partner"
+    statement:
+        SELECT loyaltynetwork.LoyaltyProvider
+            WHERE (partners CONTAINS _$selected_partner)
+}
+
+query selectAllTransactions{
+    description: "Select all transaction within the network"
+    statement:
+        SELECT org.hyperledger.composer.system.HistorianRecord
+}
+
+query selectTransaction{
+    description: "Select one particular transaction"
+    statement:
+        SELECT org.hyperledger.composer.system.HistorianRecord
+          WHERE (transactionId == _$transaction_Id)
+}
+
+query selectAllIssuedTokenTransactions{
+    description: "Select all transactions where tokens where issued"
+    statement: 
+      SELECT loyaltynetwork.issueTokens
+}
+
+
+// query selectCommoditiesByExchange {
+//   description: "Select all commodities based on their main exchange"
+//   statement:
+//       SELECT org.example.mynetwork.Commodity
+//           WHERE (mainExchange==_$exchange)
+// }
+
+// query selectCommoditiesByOwner {
+//   description: "Select all commodities based on their owner"
+//   statement:
+//       SELECT org.example.mynetwork.Commodity
+//           WHERE (owner == _$owner)
+// }
+
+// query selectCommoditiesWithHighQuantity {
+//   description: "Select commodities based on quantity"
+//   statement:
+//       SELECT org.example.mynetwork.Commodity
+//           WHERE (quantity > 60)
+// }

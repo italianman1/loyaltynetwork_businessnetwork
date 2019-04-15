@@ -17,7 +17,7 @@
  */
 rule EverybodyCanReadEverything {
     description: "Allow all participants read access to all resources"
-    participant: "loyaltynetwork.Customer"
+    participant: "loyaltynetwork.User"
     operation: READ
     resource: "loyaltynetwork.*"
     action: ALLOW
@@ -27,13 +27,13 @@ rule EverybodyCanSubmitTransactions {
     description: "Allow all participants to submit transactions"
     participant: "loyaltynetwork.Customer"
     operation: CREATE
-    resource: "loyaltynetwork.SampleTransaction"
+    resource: "loyaltynetwork.*"
     action: ALLOW
 }
 
 rule OwnerHasFullAccessToTheirAssets {
     description: "Allow all participants full access to their assets"
-    participant(p): "loyaltynetwork.Customer"
+    participant(p): "loyaltynetwork.User"
     operation: ALL
     resource(r): "loyaltynetwork.LoyaltyToken"
     condition: (r.owner.getIdentifier() === p.getIdentifier())
