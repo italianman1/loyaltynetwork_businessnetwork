@@ -1,0 +1,12 @@
+COMPOSER_CARD=admin@my-network
+COMPOSER_NAMESPACES=never
+COMPOSER_AUTHENTICATION=true
+COMPOSER_MULTIUSER=true
+COMPOSER_DATASOURCES='{
+    "db": {
+        "name": "db",
+        "connector": "mongodb",
+        "host": "mongo"
+    }
+}'
+
