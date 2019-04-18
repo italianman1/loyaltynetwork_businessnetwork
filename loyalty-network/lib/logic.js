@@ -300,17 +300,5 @@ async function initiateNetwork(tx) {
     await partnerRegistry.addAll([partner1, partner2]);
     await providerRegistry.add(provider1);
     await tokenRegistry.addAll([token1, token2, token3, token4, token5]);
-
-    //issue identities
-    const businessNetworkConnection = new BusinessNetworkConnection();
-    await businessNetworkConnection.connect('admin@loyalty-network');
-    await businessNetworkConnection.issueIdentity('loyaltynetwork.Customer#Henk1', 'henk1');
-    await businessNetworkConnection.issueIdentity('loyaltynetwork.Customer#Kees1', 'kees1');
-    await businessNetworkConnection.issueIdentity('loyaltynetwork.Customer#Piet1', 'piet1');
-
-    await businessNetworkConnection.issueIdentity('loyaltynetwork.LoyaltyPartner@Keeskroket1', 'keeskroket1');
-    await businessNetworkConnection.issueIdentity('loyaltynetwork.LoyaltyPartner@Hanscurryworst1', 'Hanscurryworst1');
-
-    await businessNetworkConnection.issueIdentity('loyaltynetwork.LoyaltyPartner@Action0', 'action0');
 }
 
