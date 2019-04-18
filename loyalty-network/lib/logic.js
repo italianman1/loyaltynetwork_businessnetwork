@@ -302,6 +302,7 @@ async function initiateNetwork(tx) {
     await tokenRegistry.addAll([token1, token2, token3, token4, token5]);
 
     //issue identities
+    const businessNetworkConnection = new BusinessNetworkConnection();
     await businessNetworkConnection.connect('admin@loyalty-network');
     await businessNetworkConnection.issueIdentity('loyaltynetwork.Customer#Henk1', 'henk1');
     await businessNetworkConnection.issueIdentity('loyaltynetwork.Customer#Kees1', 'kees1');
