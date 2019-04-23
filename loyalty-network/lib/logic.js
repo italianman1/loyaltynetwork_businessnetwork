@@ -283,16 +283,23 @@ async function initiateNetwork(tx) {
     customer1.providers = [provider1];
     customer2.providers = [provider1];
     customer3.providers = [provider1];
-    token1.owner = partner1;
-    token2.owner = partner2;
-    token3.owner = customer1;
-    token4.owner = customer2;
-    token5.owner = customer3;
     partner1.tokens = [token1];
     partner2.tokens = [token2];
     customer1.tokens = [token3];
     customer2.tokens = [token4];
     customer3.tokens = [token5];
+
+    //adding owner and issuers to the tokens
+    token1.owner = partner1;
+    token2.owner = partner2;
+    token3.owner = customer1;
+    token4.owner = customer2;
+    token5.owner = customer3;
+    token1.issuer = provider1;
+    token2.issuer = provider1;
+    token3.issuer = provider1;
+    token4.issuer = provider1;
+    token5.issuer = provider1;
 
 
     //adding everything to the network
