@@ -88,6 +88,14 @@ query selectAllIssuedTokenTransactions{
       SELECT loyaltynetwork.issueTokens
 }
 
+query selectAllRedeemedTokenTransactions{
+    description: "Select all transactions where tokens where redeemed by a particular customer from a particular provider"
+    statement: 
+      SELECT loyaltynetwork.redeemTokens
+        WHERE ((redeemer.userId == _$customer_Id) AND (accepter.userId == _$provider_Id))
+}
+
+
 
 // query selectCommoditiesByExchange {
 //   description: "Select all commodities based on their main exchange"

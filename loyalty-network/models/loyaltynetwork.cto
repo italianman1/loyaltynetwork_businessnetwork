@@ -45,7 +45,8 @@ participant LoyaltyPartner extends User{
 
 asset LoyaltyToken identified by tokenId {
   o String tokenId
-  --> User owner 
+  --> User owner
+  --> User issuer
 }
 
 transaction issueTokens{
