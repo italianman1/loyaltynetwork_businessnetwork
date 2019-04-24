@@ -99,7 +99,7 @@ query selectAllTokensFromProvider{
     description: "Select all tokens from a particular customer which were issued by a particular provider"
     statement: 
       SELECT loyaltynetwork.LoyaltyToken
-        WHERE ((owner == _$owner) AND (issuer == _$issuer))
+        WHERE ((owner == _$owner_id) AND (issuer == _$issuer_id))
 }
 
 
