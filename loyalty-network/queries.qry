@@ -95,6 +95,13 @@ query selectAllRedeemedTokenTransactions{
         WHERE ((redeemer.userId == _$customer_Id) AND (accepter.userId == _$provider_Id))
 }
 
+query selectAllTokensFromProvider{
+    description: "Select all from a particular customer which were issued by a particular provider"
+    statement: 
+      SELECT loyaltynetwork.LoyaltyToken
+        WHERE ((owner.userId == _$customer_Id) AND (issuer.userId == _$provider_Id))
+}
+
 
 
 // query selectCommoditiesByExchange {
