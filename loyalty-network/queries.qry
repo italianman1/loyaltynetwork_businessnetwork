@@ -96,10 +96,10 @@ query selectAllRedeemedTokenTransactions{
 }
 
 query selectAllTokensFromProvider{
-    description: "Select all from a particular customer which were issued by a particular provider"
+    description: "Select all tokens from a particular customer which were issued by a particular provider"
     statement: 
       SELECT loyaltynetwork.LoyaltyToken
-        WHERE ((owner.userId == _$customer_Id) AND (issuer.userId == _$provider_Id))
+        WHERE ((owner == _$owner) AND (issuer == _$issuer))
 }
 
 
