@@ -173,20 +173,21 @@ async function joinProgram(tx) {
  * @transaction
  */
 async function exitProgram(tx) {
-    if(tx.joiner.role == "Customer"){
-        tx.programOwner.customers.splice(tx.programOwner.customers.indexOf(tx.joiner), 1);
-        tx.joiner.providers.splice(tx.joiner.providers.indexOf(tx.programOwner), 1);
+
+    if(tx.exiter.role == "Customer"){
+        tx.programOwner.customers.splice(tx.programOwner.customers.indexOf(tx.exiter), 1);
+        tx.exiter.providers.splice(tx.exiter.providers.indexOf(tx.programOwner), 1);
         const customerRegistry = await getParticipantRegistry('loyaltynetwork.Customer');
-        await customerRegistry.update(tx.joiner);
+        await customerRegistry.update(tx.exiter);
         const providerRegistry = await getParticipantRegistry('loyaltynetwork.LoyaltyProvider');
         await providerRegistry.update(tx.programOwner);
     }
 
-    if(tx.joiner.role == "Partner"){
-        tx.programOwner.partners.splice(tx.programOwner.partners.indexOf(tx.joiner), 1);
-        tx.joiner.provider = {};
+    if(tx.exiter.role == "Partner"){
+        tx.programOwner.partners.splice(tx.programOwner.partners.indexOf(tx.exiter), 1);
+        tx.exiter.provider = {};
         const partnerRegistry = await getParticipantRegistry('loyaltynetwork.LoyaltyPartner');
-        await partnerRegistry.update(tx.joiner);
+        await partnerRegistry.update(tx.exiter);
         const providerRegistry = await getParticipantRegistry('loyaltynetwork.LoyaltyProvider');
         await providerRegistry.update(tx.programOwner);
     }
