@@ -57,19 +57,19 @@ async function issueTokens(tx) {
  * @transaction
  */
 async function earnTokens(tx) {
-    var earnedTokens = [];
+    var tokens = [];
 
     let i; 
 
-    for(i = 0; i< earnedTokens; i++){
+    for(i = 0; i< tx.earnedTokens; i++){
         var token = tx.issuer.tokens.pop();
         token.owner = tx.earner;
-        earnedTokens.push(token);
+        tokens.push(token);
         const assetRegistry = await getAssetRegistry('loyaltynetwork.LoyaltyToken');
         await assetRegistry.update(token);
     }
 
-    tx.earner.tokens.push(earnedTokens);
+    tx.earner.tokens.push(tokens);
     const userRegistry = await getParticipantRegistry('loyaltynetwork.User');
     await userRegistry.update(tx.earner);
     await userRegistry.update(tx.issuer);
@@ -145,20 +145,23 @@ async function tradeTokens(tx) {
  * @transaction
  */
 async function joinProgram(tx) {
+
     if(tx.joiner.role == "Customer"){
         tx.programOwner.customers.add(joiner);
         tx.joiner.providers.add(programOwner);
-        const participantRegistry = await getParticipantRegistry('loyaltynetwork.LoyaltyProvider');
-        await participantRegistry.update(tx.joiner);
-        await participantRegistry.update(tx.programOwner);
+        const customerRegistry = await getParticipantRegistry('loyaltynetwork.Customer');
+        await customerRegistry.update(tx.joiner);
+        const providerRegistry = await getParticipantRegistry('loyaltynetwork.LoyaltyProvider');
+        await providerRegistry.update(tx.programOwner);
     }
 
     if(tx.joiner.role == "Partner"){
         tx.programOwner.partners.add(joiner);
         tx.joiner.provider = programOwner;
-        const participantRegistry = await getParticipantRegistry('loyaltynetwork.LoyaltyProvider');
-        await participantRegistry.update(tx.joiner);
-        await participantRegistry.update(tx.programOwner);
+        const partnerRegistry = await getParticipantRegistry('loyaltynetwork.LoyaltyPartner');
+        await partnerRegistry.update(tx.joiner);
+        const providerRegistry = await getParticipantRegistry('loyaltynetwork.LoyaltyProvider');
+        await providerRegistry.update(tx.programOwner);
     }
 
 }
