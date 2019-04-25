@@ -35,6 +35,7 @@ async function issueTokens(tx) {
         var randomNumber = Math.floor((Math.random() * 100000) + 1);
         var token = await factory.newResource('loyaltynetwork', 'LoyaltyToken', 'Token' + randomNumber.toString());   
         token.owner = tx.issuer;
+        token.issuer = tx.issuer;
         tokens.push(token);
         await tokenAssetRegistry.add(token);
     }
@@ -82,20 +83,20 @@ async function earnTokens(tx) {
  * @transaction
  */
 async function redeemTokens(tx) {
-    var redeemedTokens = [];
+    var tokens = [];
 
     let i; 
 
     if(tx.redeemer.tokens.length > tx.redeemedTokens){
-        for(i = 0; i< redeemedTokens; i++){
+        for(i = 0; i< tx.redeemedTokens; i++){
             var token = tx.redeemer.tokens.pop();
             token.owner = tx.accepter;
-            redeemedTokens.push(token);
+            tokens.push(token);
             const assetRegistry = await getAssetRegistry('loyaltynetwork.LoyaltyToken');
             await assetRegistry.update(token);
         }
     
-        tx.accepter.tokens.push(redeemedTokens);
+        tx.accepter.tokens.push(tokens);
         const userRegistry = await getParticipantRegistry('loyaltynetwork.User');
         await userRegistry.update(tx.accepter);
         await userRegistry.update(tx.redeemer);
@@ -115,20 +116,20 @@ async function redeemTokens(tx) {
  */
 async function tradeTokens(tx) {
 
-    var tradedTokens = [];
+    var tokens = [];
 
     let i; 
 
     if(tx.sender.tokens.length > tx.amountOfTokens){
-        for(i = 0; i< amountOfTokens; i++){
+        for(i = 0; i< tx.amountOfTokens; i++){
             var token = tx.sender.tokens.pop();
             token.owner = tx.receiver;     
-            tradedTokens.push(token);
+            tokens.push(token);
             const assetRegistry = await getAssetRegistry('loyaltynetwork.LoyaltyToken');
             await assetRegistry.update(token);
         }
 
-        tx.receiver.tokens.push(tradedTokens);
+        tx.receiver.tokens.push(tokens);
         const participantRegistry = await getParticipantRegistry('loyaltynetwork.Customer');
         await participantRegistry.update(tx.sender);
         await participantRegistry.update(tx.receiver);
@@ -147,8 +148,8 @@ async function tradeTokens(tx) {
 async function joinProgram(tx) {
 
     if(tx.joiner.role == "Customer"){
-        tx.programOwner.customers.add(joiner);
-        tx.joiner.providers.add(programOwner);
+        tx.programOwner.customers.add(tx.joiner);
+        tx.joiner.providers.add(tx.programOwner);
         const customerRegistry = await getParticipantRegistry('loyaltynetwork.Customer');
         await customerRegistry.update(tx.joiner);
         const providerRegistry = await getParticipantRegistry('loyaltynetwork.LoyaltyProvider');
@@ -156,8 +157,8 @@ async function joinProgram(tx) {
     }
 
     if(tx.joiner.role == "Partner"){
-        tx.programOwner.partners.add(joiner);
-        tx.joiner.provider = programOwner;
+        tx.programOwner.partners.add(tx.joiner);
+        tx.joiner.provider = tx.programOwner;
         const partnerRegistry = await getParticipantRegistry('loyaltynetwork.LoyaltyPartner');
         await partnerRegistry.update(tx.joiner);
         const providerRegistry = await getParticipantRegistry('loyaltynetwork.LoyaltyProvider');
@@ -173,19 +174,21 @@ async function joinProgram(tx) {
  */
 async function exitProgram(tx) {
     if(tx.joiner.role == "Customer"){
-        tx.programOwner.customers.add(joiner);
-        tx.joiner.providers.add(programOwner);
-        const participantRegistry = await getParticipantRegistry('loyaltynetwork.LoyaltyProvider');
-        await participantRegistry.update(tx.joiner);
-        await participantRegistry.update(tx.programOwner);
+        tx.programOwner.customers.splice(tx.programOwner.customers.indexOf(tx.joiner), 1);
+        tx.joiner.providers.splice(tx.joiner.providers.indexOf(tx.programOwner), 1);
+        const customerRegistry = await getParticipantRegistry('loyaltynetwork.Customer');
+        await customerRegistry.update(tx.joiner);
+        const providerRegistry = await getParticipantRegistry('loyaltynetwork.LoyaltyProvider');
+        await providerRegistry.update(tx.programOwner);
     }
 
     if(tx.joiner.role == "Partner"){
-        tx.programOwner.partners.add(joiner);
-        tx.joiner.provider = programOwner;
-        const participantRegistry = await getParticipantRegistry('loyaltynetwork.LoyaltyProvider');
-        await participantRegistry.update(tx.joiner);
-        await participantRegistry.update(tx.programOwner);
+        tx.programOwner.partners.splice(tx.programOwner.partners.indexOf(tx.joiner), 1);
+        tx.joiner.provider = {};
+        const partnerRegistry = await getParticipantRegistry('loyaltynetwork.LoyaltyPartner');
+        await partnerRegistry.update(tx.joiner);
+        const providerRegistry = await getParticipantRegistry('loyaltynetwork.LoyaltyProvider');
+        await providerRegistry.update(tx.programOwner);
     }
 
 }
