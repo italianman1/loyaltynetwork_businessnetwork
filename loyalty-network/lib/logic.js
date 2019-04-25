@@ -13,6 +13,7 @@
  */
 
 'use strict';
+
 /**
  * Write your transction processor functions here
  */
@@ -24,21 +25,21 @@
  */
 async function issueTokens(tx) {
 
-    var issuedTokens = [];
+    var tokens = [];
 
     let i;
 
-    for(i = 0; i< issuedTokens; i++){
+    for(i = 0; i < tx.issuedTokens; i++){
         const tokenAssetRegistry = await getAssetRegistry('loyaltynetwork.LoyaltyToken');
         var factory = getFactory();
         var randomNumber = Math.floor((Math.random() * 100000) + 1);
         var token = await factory.newResource('loyaltynetwork', 'LoyaltyToken', 'Token' + randomNumber.toString());   
         token.owner = tx.issuer;
-        issuedTokens.push(token);
+        tokens.push(token);
         await tokenAssetRegistry.add(token);
     }
 
-    tx.issuer.tokens.push(issuedTokens);
+    tx.issuer.tokens.push(tokens);
     const participantRegistry = await getParticipantRegistry('loyaltynetwork.LoyaltyProvider');
     await participantRegistry.update(tx.issuer);
 
