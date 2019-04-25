@@ -148,8 +148,8 @@ async function tradeTokens(tx) {
 async function joinProgram(tx) {
 
     if(tx.joiner.role == "Customer"){
-        tx.programOwner.customers.add(tx.joiner);
-        tx.joiner.providers.add(tx.programOwner);
+        tx.programOwner.customers.push(tx.joiner);
+        tx.joiner.providers.push(tx.programOwner);
         const customerRegistry = await getParticipantRegistry('loyaltynetwork.Customer');
         await customerRegistry.update(tx.joiner);
         const providerRegistry = await getParticipantRegistry('loyaltynetwork.LoyaltyProvider');
@@ -157,7 +157,7 @@ async function joinProgram(tx) {
     }
 
     if(tx.joiner.role == "Partner"){
-        tx.programOwner.partners.add(tx.joiner);
+        tx.programOwner.partners.push(tx.joiner);
         tx.joiner.provider = tx.programOwner;
         const partnerRegistry = await getParticipantRegistry('loyaltynetwork.LoyaltyPartner');
         await partnerRegistry.update(tx.joiner);
