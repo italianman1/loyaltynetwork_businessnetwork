@@ -27,7 +27,7 @@ async function issueTokens(tx) {
     var tokens = [];
     const factory = getFactory();
     const tokenAssetRegistry = await getAssetRegistry('loyaltynetwork.LoyaltyToken');
-    var allTokens = tokenAssetRegistry.getAll();
+    var allTokens = await tokenAssetRegistry.getAll();
     let i;
 
     for(i = 0; i < tx.issuedTokens; i++){
