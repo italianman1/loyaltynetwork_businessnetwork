@@ -32,11 +32,13 @@ async function issueTokens(tx) {
 
     for(i = 0; i < tx.issuedTokens; i++){
         var idNumber = allTokens.length + i;
-        var token = await factory.newResource('loyaltynetwork', 'LoyaltyToken', 'Token' + idNumber.toString());   
-        var issuerPointer = await factory.newRelationship('loyaltynetwork', 'LoyaltyProvider', tx.issuer.userId); 
-        token.owner = tx.issuer;
-        token.issuer = tx.issuer;
-        tokens.push(token);
+        factory.newResource('loyaltynetwork', 'LoyaltyToken', 'Token' + idNumber.toString())
+        .toPromise()
+        .then(token => {
+            token.owner = tx.issuer;
+            token.issuer = tx.issuer;
+            tokens.push(token);
+        });   
     }
 
     await tokenAssetRegistry.addAll(tokens);
