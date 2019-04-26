@@ -33,7 +33,7 @@ async function issueTokens(tx) {
         var factory = getFactory();
         var randomNumber = Math.floor((Math.random() * 100000) + 1);
         var token = await factory.newResource('loyaltynetwork', 'LoyaltyToken', 'Token' + randomNumber.toString());   
-        var issuerPointer = await factory.newRelationship('loyaltynetwork', 'User', tx.issuer.userId); 
+        var issuerPointer = await factory.newRelationship('loyaltynetwork', 'LoyaltyProvider', tx.issuer.userId); 
         token.owner = issuerPointer;
         token.issuer = issuerPointer;
         tokens.push(token);
