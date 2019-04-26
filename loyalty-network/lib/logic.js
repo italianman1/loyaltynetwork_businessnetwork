@@ -24,7 +24,7 @@
  * @transaction
  */
 async function issueTokens(tx) {
-    var tokens = [];
+    // var tokens = [];
     const factory = getFactory();
     const tokenAssetRegistry = await getAssetRegistry('loyaltynetwork.LoyaltyToken');
     var allTokens = await tokenAssetRegistry.getAll();
@@ -35,11 +35,11 @@ async function issueTokens(tx) {
         var token = factory.newResource('loyaltynetwork', 'LoyaltyToken', 'Token' + idNumber.toString());
         token.owner = tx.issuer;
         token.issuer = tx.issuer;
-        tokens.push(token);
+        await tokenAssetRegistry.add(token);
+        tx.issuer.tokens.push(token);
+        // tokens.push(token);
     }
-
-    await tokenAssetRegistry.addAll(tokens);
-    tx.issuer.tokens.push(tokens);
+   
     const participantRegistry = await getParticipantRegistry('loyaltynetwork.LoyaltyProvider');
     await participantRegistry.update(tx.issuer);
 
