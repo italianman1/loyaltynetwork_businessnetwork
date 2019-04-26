@@ -24,9 +24,9 @@
  * @transaction
  */
 async function issueTokens(tx) {
-    // var tokens = [];
     const factory = getFactory();
     const tokenAssetRegistry = await getAssetRegistry('loyaltynetwork.LoyaltyToken');
+    const participantRegistry = await getParticipantRegistry('loyaltynetwork.LoyaltyProvider');
     var allTokens = await tokenAssetRegistry.getAll();
     let i;
 
@@ -37,10 +37,8 @@ async function issueTokens(tx) {
         token.issuer = tx.issuer;
         await tokenAssetRegistry.add(token);
         tx.issuer.tokens.push(token);
-        // tokens.push(token);
     }
    
-    const participantRegistry = await getParticipantRegistry('loyaltynetwork.LoyaltyProvider');
     await participantRegistry.update(tx.issuer);
 
     // Emit an event for the modified asset.
@@ -57,20 +55,17 @@ async function issueTokens(tx) {
  * @transaction
  */
 async function earnTokens(tx) {
-    var tokens = [];
-
     let i; 
+    const assetRegistry = await getAssetRegistry('loyaltynetwork.LoyaltyToken');
+    const userRegistry = await getParticipantRegistry('loyaltynetwork.User');
 
     for(i = 0; i< tx.earnedTokens; i++){
         var token = tx.issuer.tokens.pop();
         token.owner = tx.earner;
-        tokens.push(token);
-        const assetRegistry = await getAssetRegistry('loyaltynetwork.LoyaltyToken');
         await assetRegistry.update(token);
+        tx.earner.tokens.push(token);
     }
 
-    tx.earner.tokens.push(tokens);
-    const userRegistry = await getParticipantRegistry('loyaltynetwork.User');
     await userRegistry.update(tx.earner);
     await userRegistry.update(tx.issuer);
 
@@ -82,21 +77,18 @@ async function earnTokens(tx) {
  * @transaction
  */
 async function redeemTokens(tx) {
-    var tokens = [];
-
     let i; 
+    const assetRegistry = await getAssetRegistry('loyaltynetwork.LoyaltyToken');
+    const userRegistry = await getParticipantRegistry('loyaltynetwork.User');
 
     if(tx.redeemer.tokens.length > tx.redeemedTokens){
         for(i = 0; i< tx.redeemedTokens; i++){
             var token = tx.redeemer.tokens.pop();
             token.owner = tx.accepter;
-            tokens.push(token);
-            const assetRegistry = await getAssetRegistry('loyaltynetwork.LoyaltyToken');
             await assetRegistry.update(token);
+            tx.accepter.tokens.push(tokens);
         }
-    
-        tx.accepter.tokens.push(tokens);
-        const userRegistry = await getParticipantRegistry('loyaltynetwork.User');
+
         await userRegistry.update(tx.accepter);
         await userRegistry.update(tx.redeemer);
     }
@@ -114,22 +106,18 @@ async function redeemTokens(tx) {
  * @transaction
  */
 async function tradeTokens(tx) {
-
-    var tokens = [];
-
+    const assetRegistry = await getAssetRegistry('loyaltynetwork.LoyaltyToken');
+    const participantRegistry = await getParticipantRegistry('loyaltynetwork.Customer');
     let i; 
 
     if(tx.sender.tokens.length > tx.amountOfTokens){
         for(i = 0; i< tx.amountOfTokens; i++){
             var token = tx.sender.tokens.pop();
             token.owner = tx.receiver;     
-            tokens.push(token);
-            const assetRegistry = await getAssetRegistry('loyaltynetwork.LoyaltyToken');
             await assetRegistry.update(token);
+            tx.receiver.tokens.push(token);
         }
 
-        tx.receiver.tokens.push(tokens);
-        const participantRegistry = await getParticipantRegistry('loyaltynetwork.Customer');
         await participantRegistry.update(tx.sender);
         await participantRegistry.update(tx.receiver);
     }
