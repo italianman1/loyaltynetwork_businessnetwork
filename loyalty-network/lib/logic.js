@@ -30,7 +30,7 @@ async function issueTokens(tx) {
     var allTokens = await tokenAssetRegistry.getAll();
     let i;
 
-    for(i = 0; i < tx.issuedTokens; i++){
+    for(i = 1; i <= tx.issuedTokens; i++){
         var idNumber = allTokens.length + i;
         var token = factory.newResource('loyaltynetwork', 'LoyaltyToken', 'Token' + idNumber.toString());
         token.owner = tx.issuer;
