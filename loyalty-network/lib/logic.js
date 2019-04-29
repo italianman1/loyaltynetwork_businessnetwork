@@ -84,8 +84,12 @@ async function redeemTokens(tx) {
     const providerRegistry = await getParticipantRegistry('loyaltynetwork.LoyaltyProvider');
     const partnerRegistry = await getParticipantRegistry('loyaltynetwork.LoyaltyPartner');
 
-    if(tx.redeemer.tokens.length > tx.redeemedTokens){
-        for(i = 0; i< tx.redeemedTokens; i++){
+    if(tx.redeemer.tokens.length < tx.redeemedTokens){
+        throw new Error('Insufficient tokens to redeem');
+    }
+
+    if(tx.redeemer.tokens.length >= tx.redeemedTokens){
+        for(i = 0; i < tx.redeemedTokens; i++){
             var token = tx.redeemer.tokens.pop();
             token.owner = tx.accepter;
             await assetRegistry.update(token);
@@ -104,9 +108,7 @@ async function redeemTokens(tx) {
         await customerRegistry.update(tx.redeemer);
     }
 
-    if(tx.redeemer.tokens.length < tx.redeemedTokens){
-        throw new Error('Insufficient tokens to redeem');
-    }
+    
 }
 
 /**
@@ -118,8 +120,12 @@ async function tradeTokens(tx) {
     const assetRegistry = await getAssetRegistry('loyaltynetwork.LoyaltyToken');
     const participantRegistry = await getParticipantRegistry('loyaltynetwork.Customer');
     let i; 
+    
+    if(tx.sender.tokens.length < tx.amountOfTokens){
+        throw new Error('Insufficient tokens to trade');
+    }
 
-    if(tx.sender.tokens.length > tx.amountOfTokens){
+    if(tx.sender.tokens.length >= tx.amountOfTokens){
         for(i = 0; i< tx.amountOfTokens; i++){
             var token = tx.sender.tokens.pop();
             token.owner = tx.receiver;     
@@ -131,9 +137,6 @@ async function tradeTokens(tx) {
         await participantRegistry.update(tx.receiver);
     }
 
-    if(tx.sender.tokens.length < tx.amountOfTokens){
-        throw new Error('Insufficient tokens to trade');
-    }
 }
 
 /**
