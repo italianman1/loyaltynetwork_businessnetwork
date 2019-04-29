@@ -57,7 +57,8 @@ async function issueTokens(tx) {
 async function earnTokens(tx) {
     let i; 
     const assetRegistry = await getAssetRegistry('loyaltynetwork.LoyaltyToken');
-    const userRegistry = await getParticipantRegistry('loyaltynetwork.User');
+    const customerRegistry = await getParticipantRegistry('loyaltynetwork.Customer');
+    const providerRegistry = await getParticipantRegistry('loyaltynetwork.LoyaltyProvider');
 
     for(i = 0; i< tx.earnedTokens; i++){
         var token = tx.issuer.tokens.pop();
@@ -66,8 +67,8 @@ async function earnTokens(tx) {
         tx.earner.tokens.push(token);
     }
 
-    await userRegistry.update(tx.earner);
-    await userRegistry.update(tx.issuer);
+    await customerRegistry.update(tx.earner);
+    await providerRegistry.update(tx.issuer);
 
 }
 
@@ -79,7 +80,9 @@ async function earnTokens(tx) {
 async function redeemTokens(tx) {
     let i; 
     const assetRegistry = await getAssetRegistry('loyaltynetwork.LoyaltyToken');
-    const userRegistry = await getParticipantRegistry('loyaltynetwork.User');
+    const customerRegistry = await getParticipantRegistry('loyaltynetwork.Customer');
+    const providerRegistry = await getParticipantRegistry('loyaltynetwork.LoyaltyProvider');
+    const partnerRegistry = await getParticipantRegistry('loyaltynetwork.LoyaltyPartner');
 
     if(tx.redeemer.tokens.length > tx.redeemedTokens){
         for(i = 0; i< tx.redeemedTokens; i++){
@@ -89,15 +92,21 @@ async function redeemTokens(tx) {
             tx.accepter.tokens.push(tokens);
         }
 
-        await userRegistry.update(tx.accepter);
-        await userRegistry.update(tx.redeemer);
+        if(tx.accepter.role == "Partner"){
+            await partnerRegistry.update(tx.accepter);
+        }
+
+        
+        if(tx.accepter.role == "Provider"){
+            await providerRegistry.update(tx.accepter);
+        }
+       
+        await customerRegistry.update(tx.redeemer);
     }
 
     if(tx.redeemer.tokens.length < tx.redeemedTokens){
         throw new Error('Insufficient tokens to redeem');
     }
-   
-
 }
 
 /**
