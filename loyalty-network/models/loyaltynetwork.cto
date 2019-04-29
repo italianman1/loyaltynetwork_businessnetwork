@@ -92,6 +92,12 @@ transaction returnIssuedTokensByProvider{
   --> User issuer
 }
 
+@commit(false)
+@returns(Transaction[])
+transaction returnTransactionsByUser{
+  --> User user
+}
+
 
 // @commit(false)
 // @returns(Customer[])

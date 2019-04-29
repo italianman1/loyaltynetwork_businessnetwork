@@ -215,6 +215,26 @@ async function returnIssuedTokensByProvider(tx) {
 }
 
 /**
+ * A transaction which returns the transaction of a particular user involved
+ * @param {loyaltynetwork.returnTransactionsByUser} returnTransactionByUser
+ * @returns {org.hyperledger.composer.system.Transaction[]} 
+ * @transaction
+ */
+async function returnTransactionsByUser(tx) {
+    let transactions = []; 
+    let allJoinTransactions = await query('selectAllJoinProgramTransactionsByUser', { inputValue: tx.user });
+    let allExitTransactions = await query('selectAllExitProgramTransactionsByUser', { inputValue: tx.user});
+    let allEarnTransactions = await query('selectAllEarnTokenTransactionsByUser', { inputValue: tx.user});
+    let allRedeemTransactions = await query('selectAllRedeemedTokenTransactionsByUser', { inputValue: tx.user});
+    let allTradeTransactions = await query('selectAllTradeTokenTransactionsByUser', { inputValue: tx.user});
+
+    transactions.push.apply(allJoinTransactions, allExitTransactions, allEarnTransactions, allRedeemTransactions, allTradeTransactions);
+
+    return transactions;
+
+}
+
+/**
  * A transaction to initiate the network with some dummy data
  * @param {loyaltynetwork.initiateNetwork} initiateNetwork
  * @transaction

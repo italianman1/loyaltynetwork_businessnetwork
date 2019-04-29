@@ -82,17 +82,46 @@ query selectTransaction{
           WHERE (transactionId == _$transaction_Id)
 }
 
-query selectAllIssuedTokenTransactions{
+query selectAllIssuedTokenTransactionsByUser{
     description: "Select all transactions where tokens where issued"
     statement: 
       SELECT loyaltynetwork.issueTokens
+        WHERE (issuer == _$user)
 }
 
-query selectAllRedeemedTokenTransactions{
-    description: "Select all transactions where tokens where redeemed by a particular customer from a particular provider"
+query selectAllEarnTokenTransactionsByUser{
+    description: "Select all transactions where tokens where issued"
+    statement: 
+      SELECT loyaltynetwork.earnTokens
+        WHERE ((earner == _$user) OR (issuer == _$user))
+}
+
+query selectAllRedeemedTokenTransactionsByUser {
+    description: "Select all transactions where tokens where issued"
     statement: 
       SELECT loyaltynetwork.redeemTokens
-        WHERE ((redeemer.userId == _$customer_Id) AND (accepter.userId == _$provider_Id))
+        WHERE ((redeemer == _$user) OR (accepter == _$user))
+}
+
+query selectAllJoinProgramTransactionsByUser{
+    description: "Select all transactions where tokens where issued"
+    statement: 
+      SELECT loyaltynetwork.joinProgram
+        WHERE ((joiner == _$user) OR (programOwner == _$user))
+}
+
+query selectAllExitProgramTransactionsByUser{
+    description: "Select all transactions where tokens where issued"
+    statement: 
+      SELECT loyaltynetwork.exitProgram
+        WHERE ((exiter == _$user OR programOwner == _$user))
+}
+
+query selectAllTradeTokenTransactionsByUser{
+    description: "Select all transactions where tokens where issued"
+    statement: 
+      SELECT loyaltynetwork.tradeTokens
+        WHERE ((sender == _$user OR receiver == _$user))
 }
 
 query selectAllTokensFromProvider{
