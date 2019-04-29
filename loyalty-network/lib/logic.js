@@ -89,7 +89,7 @@ async function redeemTokens(tx) {
             var token = tx.redeemer.tokens.pop();
             token.owner = tx.accepter;
             await assetRegistry.update(token);
-            tx.accepter.tokens.push(tokens);
+            tx.accepter.tokens.push(token);
         }
 
         if(tx.accepter.role == "Partner"){
