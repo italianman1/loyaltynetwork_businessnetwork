@@ -150,7 +150,7 @@ query selectAllTradeTokenTransactionsByCustomer{
     description: "Select all transactions where tokens where traded by a customer"
     statement: 
       SELECT loyaltynetwork.tradeTokens
-        WHERE ((sender == _$customer OR receiver == _$customer))
+        WHERE ((sender == _$customer) OR (receiver == _$customer))
 }
 
 query selectAllTokensFromProvider{
