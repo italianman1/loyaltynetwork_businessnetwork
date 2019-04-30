@@ -222,28 +222,28 @@ async function returnIssuedTokensByProvider(tx) {
  */
 async function returnTransactionsByUser(tx) {
     let transactions = []; 
-    
+
     if(tx.user.role == "Customer") {
-        let allJoinTransactions = await query('selectAllJoinProgramTransactionsByCustomer', { customer: tx.user });
-        let allExitTransactions = await query('selectAllExitProgramTransactionsByCustomer', { customer: tx.user});
-        let allEarnTransactions = await query('selectAllEarnTokenTransactionsByCustomer', { customer: tx.user});
-        let allRedeemTransactions = await query('selectAllRedeemedTokenTransactionsByCustomer', { customer: tx.user});
-        let allTradeTransactions = await query('selectAllTradeTokenTransactionsByCustomer', { customer: tx.user});
+        let allJoinTransactions = await query('selectAllJoinProgramTransactionsByCustomer', { customer: tx.user.toURI().toURI() });
+        let allExitTransactions = await query('selectAllExitProgramTransactionsByCustomer', { customer: tx.user.toURI()});
+        let allEarnTransactions = await query('selectAllEarnTokenTransactionsByCustomer', { customer: tx.user.toURI()});
+        let allRedeemTransactions = await query('selectAllRedeemedTokenTransactionsByCustomer', { customer: tx.user.toURI()});
+        let allTradeTransactions = await query('selectAllTradeTokenTransactionsByCustomer', { customer: tx.user.toURI()});
         transactions.push.apply(allJoinTransactions, allExitTransactions, allEarnTransactions, allRedeemTransactions, allTradeTransactions);
     }
 
     if(tx.user.role == "Partner") {
-        let allEarnTransactions = await query('selectAllEarnTokenTransactionsByProviderOrPartner', { provider: tx.user});
-        let allRedeemTransactions = await query('selectAllRedeemedTokenTransactionsByProviderOrPartner', { provider: tx.user});
+        let allEarnTransactions = await query('selectAllEarnTokenTransactionsByProviderOrPartner', { provider: tx.user.toURI()});
+        let allRedeemTransactions = await query('selectAllRedeemedTokenTransactionsByProviderOrPartner', { provider: tx.user.toURI()});
         transactions.push.apply(allEarnTransactions, allRedeemTransactions);
     }
 
     if(tx.user.role == "Provider") {
-        let allJoinTransactions = await query('selectAllJoinProgramTransactionsByProvider', { provider: tx.user });
-        let allExitTransactions = await query('selectAllExitProgramTransactionsByProvider', { provider: tx.user});
-        let allEarnTransactions = await query('selectAllEarnTokenTransactionsByProviderOrPartner', { provider: tx.user});
-        let allRedeemTransactions = await query('selectAllRedeemedTokenTransactionsByProviderOrPartner', { provider: tx.user});
-        let allIssueTransactions = await query('selectAllIssuedTokenTransactionsByProvider', { provider: tx.user});
+        let allJoinTransactions = await query('selectAllJoinProgramTransactionsByProvider', { provider: tx.user.toURI() });
+        let allExitTransactions = await query('selectAllExitProgramTransactionsByProvider', { provider: tx.user.toURI()});
+        let allEarnTransactions = await query('selectAllEarnTokenTransactionsByProviderOrPartner', { provider: tx.user.toURI()});
+        let allRedeemTransactions = await query('selectAllRedeemedTokenTransactionsByProviderOrPartner', { provider: tx.user.toURI()});
+        let allIssueTransactions = await query('selectAllIssuedTokenTransactionsByProvider', { provider: tx.user.toURI()});
         transactions.push.apply(allJoinTransactions, allExitTransactions, allEarnTransactions, allRedeemTransactions, allIssueTransactions);
     }
 
