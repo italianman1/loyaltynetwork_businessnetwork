@@ -222,11 +222,11 @@ async function returnIssuedTokensByProvider(tx) {
  */
 async function returnTransactionsByUser(tx) {
     let transactions = []; 
-    let allJoinTransactions = await query('selectAllJoinProgramTransactionsByUser', { inputValue: tx.user });
-    let allExitTransactions = await query('selectAllExitProgramTransactionsByUser', { inputValue: tx.user});
-    let allEarnTransactions = await query('selectAllEarnTokenTransactionsByUser', { inputValue: tx.user});
-    let allRedeemTransactions = await query('selectAllRedeemedTokenTransactionsByUser', { inputValue: tx.user});
-    let allTradeTransactions = await query('selectAllTradeTokenTransactionsByUser', { inputValue: tx.user});
+    let allJoinTransactions = await query('selectAllJoinProgramTransactionsByUser', { user: tx.user });
+    let allExitTransactions = await query('selectAllExitProgramTransactionsByUser', { user: tx.user});
+    let allEarnTransactions = await query('selectAllEarnTokenTransactionsByUser', { user: tx.user});
+    let allRedeemTransactions = await query('selectAllRedeemedTokenTransactionsByUser', { user: tx.user});
+    let allTradeTransactions = await query('selectAllTradeTokenTransactionsByUser', { user: tx.user});
 
     transactions.push.apply(allJoinTransactions, allExitTransactions, allEarnTransactions, allRedeemTransactions, allTradeTransactions);
 
