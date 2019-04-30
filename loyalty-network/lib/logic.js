@@ -217,22 +217,19 @@ async function returnIssuedTokensByProvider(tx) {
 /**
  * A transaction which returns the transaction of a particular user involved
  * @param {loyaltynetwork.returnTransactionsByUser} returnTransactionByUser
- * @returns {org.hyperledger.composer.system.Transaction[]} 
+ * @returns {} 
  * @transaction
  */
 async function returnTransactionsByUser(tx) {
     let transactions = []; 
 
-    if(tx.user.role == "Customer") {
+    if(true) {
         let allJoinTransactions = await query('selectAllJoinProgramTransactionsByCustomer', { customer: tx.user.userId});
         let allExitTransactions = await query('selectAllExitProgramTransactionsByCustomer', { customer: tx.user.userId});
         let allEarnTransactions = await query('selectAllEarnTokenTransactionsByCustomer', { customer: tx.user.userId});
         let allRedeemTransactions = await query('selectAllRedeemedTokenTransactionsByCustomer', { customer: tx.user.userId});
         let allTradeTransactions = await query('selectAllTradeTokenTransactionsByCustomer', { customer: tx.user.userId});
-        console.log(allJoinTransactions);
-        console.log(allEarnTransactions);
         transactions.concat(allJoinTransactions, allExitTransactions, allEarnTransactions, allRedeemTransactions, allTradeTransactions);
-        console.log(transactions);
     }
 
     if(tx.user.role == "Partner") {

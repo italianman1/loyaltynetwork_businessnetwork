@@ -93,7 +93,7 @@ transaction returnIssuedTokensByProvider{
 }
 
 @commit(false)
-@returns(Transaction[])
+@returns()
 transaction returnTransactionsByUser{
   --> User user
 }
