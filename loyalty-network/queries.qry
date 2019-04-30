@@ -138,7 +138,6 @@ query selectAllExitProgramTransactionsByCustomer{
         WHERE (exiter == _$customer)
 }
 
-
 query selectAllExitProgramTransactionsByProvider{
     description: "Select all transactions where where a customer left a program and where a particular provider is the program owner"
     statement:  

@@ -229,13 +229,13 @@ async function returnTransactionsByUser(tx) {
         let allEarnTransactions = await query('selectAllEarnTokenTransactionsByCustomer', { customer: tx.user.toURI()});
         let allRedeemTransactions = await query('selectAllRedeemedTokenTransactionsByCustomer', { customer: tx.user.toURI()});
         let allTradeTransactions = await query('selectAllTradeTokenTransactionsByCustomer', { customer: tx.user.toURI()});
-        transactions.push.apply(allJoinTransactions, allExitTransactions, allEarnTransactions, allRedeemTransactions, allTradeTransactions);
+        transactions.concat(allJoinTransactions, allExitTransactions, allEarnTransactions, allRedeemTransactions, allTradeTransactions);
     }
 
     if(tx.user.role == "Partner") {
         let allEarnTransactions = await query('selectAllEarnTokenTransactionsByProviderOrPartner', { provider: tx.user.toURI()});
         let allRedeemTransactions = await query('selectAllRedeemedTokenTransactionsByProviderOrPartner', { provider: tx.user.toURI()});
-        transactions.push.apply(allEarnTransactions, allRedeemTransactions);
+        transactions.concat(allEarnTransactions, allRedeemTransactions);
     }
 
     if(tx.user.role == "Provider") {
@@ -244,7 +244,7 @@ async function returnTransactionsByUser(tx) {
         let allEarnTransactions = await query('selectAllEarnTokenTransactionsByProviderOrPartner', { provider: tx.user.toURI()});
         let allRedeemTransactions = await query('selectAllRedeemedTokenTransactionsByProviderOrPartner', { provider: tx.user.toURI()});
         let allIssueTransactions = await query('selectAllIssuedTokenTransactionsByProvider', { provider: tx.user.toURI()});
-        transactions.push.apply(allJoinTransactions, allExitTransactions, allEarnTransactions, allRedeemTransactions, allIssueTransactions);
+        transactions.concat(allJoinTransactions, allExitTransactions, allEarnTransactions, allRedeemTransactions, allIssueTransactions);
     }
 
     return transactions;
