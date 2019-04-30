@@ -217,7 +217,7 @@ async function returnIssuedTokensByProvider(tx) {
 /**
  * A transaction which returns the transaction of a particular user involved
  * @param {loyaltynetwork.returnTransactionsByUser} returnTransactionByUser
- * @returns {} 
+ * @returns {org.hyperledger.composer.system.Transaction} 
  * @transaction
  */
 async function returnTransactionsByUser(tx) {
