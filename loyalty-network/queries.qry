@@ -61,7 +61,6 @@ query returnLoyaltyProvidersByCustomer {
             WHERE (customers CONTAINS _$selected_customer)
 }
 
-
 query returnLoyaltyProvidersByPartner {
     description: "Select all providers who have a particular partner"
     statement:
@@ -93,7 +92,7 @@ query selectAllEarnTokenTransactionsByCustomer{
     description: "Select all transactions where tokens where earned by a customer"
     statement: 
       SELECT loyaltynetwork.earnTokens
-        WHERE (earner.userId == _$customer)
+        WHERE (earner == _$customer)
 }
 
 query selectAllEarnTokenTransactionsByProviderOrPartner{
