@@ -226,7 +226,7 @@ async function returnTransactionsByUser(tx) {
     if(true) {
         let allJoinTransactions = await query('selectAllJoinProgramTransactionsByCustomer', { customer: tx.user.userId});
         let allExitTransactions = await query('selectAllExitProgramTransactionsByCustomer', { customer: tx.user.userId});
-        let allEarnTransactions = await query('selectAllEarnTokenTransactionsByCustomer', { customer: tx.user.userId});
+        let allEarnTransactions = await query('selectAllEarnTokenTransactionsByCustomer', { customer: tx.user});
         let allRedeemTransactions = await query('selectAllRedeemedTokenTransactionsByCustomer', { customer: tx.user.userId});
         let allTradeTransactions = await query('selectAllTradeTokenTransactionsByCustomer', { customer: tx.user.userId});
         transactions.concat(allJoinTransactions, allExitTransactions, allEarnTransactions, allRedeemTransactions, allTradeTransactions);
