@@ -172,7 +172,7 @@ async function joinProgram(tx) {
  * @transaction
  */
 async function registerForAProgram(tx) {
-    
+
     tx.programOwner.registrations.push(tx.register);
     const providerRegistry = await getParticipantRegistry('loyaltynetwork.LoyaltyProvider');
     await providerRegistry.update(tx.programOwner);
@@ -338,7 +338,8 @@ async function initiateNetwork(tx) {
     provider1.email = "action@gmail.com";
     provider1.role = "Provider";
     provider1.tokens = [];
-
+    provider1.registrations = [];
+    provider1.conversionRate = 1;
 
     //adding the provider to the customers and partners
     partner1.provider = provider1;
