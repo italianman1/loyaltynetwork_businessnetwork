@@ -78,6 +78,11 @@ transaction joinProgram {
   --> User joiner
 }
 
+transaction registerForAProgram {
+  --> LoyaltyProvider programOwner
+  --> LoyaltyPartner register
+}
+
 transaction exitProgram {
   --> LoyaltyProvider programOwner
   --> User exiter

@@ -167,6 +167,18 @@ async function joinProgram(tx) {
 }
 
 /**
+ * A transaction when a customers wants to join a loyalty program
+ * @param {loyaltynetwork.registerForAProgram} registerForAProgram
+ * @transaction
+ */
+async function registerForAProgram(tx) {
+    
+    tx.programOwner.registrations.push(tx.register);
+    const providerRegistry = await getParticipantRegistry('loyaltynetwork.LoyaltyProvider');
+    await providerRegistry.update(tx.programOwner);
+}
+
+/**
  * A transaction when a customers wants to exit a loyalty program
  * @param {loyaltynetwork.exitProgram} exitProgram
  * @transaction
