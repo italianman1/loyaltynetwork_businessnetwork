@@ -95,7 +95,8 @@ transaction returnIssuedTokensByProvider{
 @commit(false)
 @returns(Transaction[])
 transaction returnTransactionsByUser{
-  --> User user
+  o String role
+  o String resourceString
 }
 
 

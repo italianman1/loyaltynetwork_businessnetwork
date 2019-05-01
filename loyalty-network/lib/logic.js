@@ -217,33 +217,33 @@ async function returnIssuedTokensByProvider(tx) {
 /**
  * A transaction which returns the transaction of a particular user involved
  * @param {loyaltynetwork.returnTransactionsByUser} returnTransactionByUser
- * @returns {org.hyperledger.composer.system.Transaction} 
+ * @returns {org.hyperledger.composer.system.Transaction[]} 
  * @transaction
  */
 async function returnTransactionsByUser(tx) {
     let transactions = []; 
 
-    if(true) {
-        let allJoinTransactions = await query('selectAllJoinProgramTransactionsByCustomer', { customer: tx.user.userId});
-        let allExitTransactions = await query('selectAllExitProgramTransactionsByCustomer', { customer: tx.user.userId});
-        let allEarnTransactions = await query('selectAllEarnTokenTransactionsByCustomer', { customer: tx.user.toURI()});
-        let allRedeemTransactions = await query('selectAllRedeemedTokenTransactionsByCustomer', { customer: tx.user.userId});
-        let allTradeTransactions = await query('selectAllTradeTokenTransactionsByCustomer', { customer: tx.user.userId});
+    if(tx.role == "Customer") {
+        let allJoinTransactions = await query('selectAllJoinProgramTransactionsByCustomer', { customer: tx.resourceString});
+        let allExitTransactions = await query('selectAllExitProgramTransactionsByCustomer', { customer: tx.resourceString});
+        let allEarnTransactions = await query('selectAllEarnTokenTransactionsByCustomer', { customer: tx.resourceString});
+        let allRedeemTransactions = await query('selectAllRedeemedTokenTransactionsByCustomer', { customer: tx.resourceString});
+        let allTradeTransactions = await query('selectAllTradeTokenTransactionsByCustomer', { customer: tx.resourceString});
         transactions.concat(allJoinTransactions, allExitTransactions, allEarnTransactions, allRedeemTransactions, allTradeTransactions);
     }
 
-    if(tx.user.role == "Partner") {
-        let allEarnTransactions = await query('selectAllEarnTokenTransactionsByProviderOrPartner', { provider: tx.user.userId});
-        let allRedeemTransactions = await query('selectAllRedeemedTokenTransactionsByProviderOrPartner', { provider: tx.user.userId});
+    if(tx.role == "Partner") {
+        let allEarnTransactions = await query('selectAllEarnTokenTransactionsByProviderOrPartner', { provider: tx.resourceString});
+        let allRedeemTransactions = await query('selectAllRedeemedTokenTransactionsByProviderOrPartner', { provider: tx.resourceString});
         transactions.concat(allEarnTransactions, allRedeemTransactions);
     }
 
-    if(tx.user.role == "Provider") {
-        let allJoinTransactions = await query('selectAllJoinProgramTransactionsByProvider', { provider: tx.user.userId});
-        let allExitTransactions = await query('selectAllExitProgramTransactionsByProvider', { provider: tx.user.userId});
-        let allEarnTransactions = await query('selectAllEarnTokenTransactionsByProviderOrPartner', { provider: tx.user.userId});
-        let allRedeemTransactions = await query('selectAllRedeemedTokenTransactionsByProviderOrPartner', { provider: tx.user.userId});
-        let allIssueTransactions = await query('selectAllIssuedTokenTransactionsByProvider', { provider: tx.user.userId});
+    if(tx.role == "Provider") {
+        let allJoinTransactions = await query('selectAllJoinProgramTransactionsByProvider', { provider: tx.resourceString});
+        let allExitTransactions = await query('selectAllExitProgramTransactionsByProvider', { provider: tx.resourceString});
+        let allEarnTransactions = await query('selectAllEarnTokenTransactionsByProviderOrPartner', { provider: tx.resourceString});
+        let allRedeemTransactions = await query('selectAllRedeemedTokenTransactionsByProviderOrPartner', { provider: tx.resourceString});
+        let allIssueTransactions = await query('selectAllIssuedTokenTransactionsByProvider', { provider: tx.resourceString});
         transactions.concat(allJoinTransactions, allExitTransactions, allEarnTransactions, allRedeemTransactions, allIssueTransactions);
     }
 

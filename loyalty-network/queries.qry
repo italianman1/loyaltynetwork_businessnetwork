@@ -85,7 +85,7 @@ query selectAllIssuedTokenTransactionsByProvider{
     description: "Select all transactions where tokens where issued by a provider"
     statement: 
       SELECT loyaltynetwork.issueTokens
-        WHERE (issuer.userId == _$providerId)
+        WHERE (issuer == _$provider)
 }
 
 query selectAllEarnTokenTransactionsByCustomer{
@@ -99,56 +99,56 @@ query selectAllEarnTokenTransactionsByProviderOrPartner{
     description: "Select all transactions where tokens where earned and were issued by a provider or a partner"
     statement: 
       SELECT loyaltynetwork.earnTokens
-        WHERE (issuer.userId == _$provider)
+        WHERE (issuer == _$provider)
 }
 
 query selectAllRedeemedTokenTransactionsByCustomer {
     description: "Select all transactions where tokens where redeemed by a customer"
     statement: 
       SELECT loyaltynetwork.redeemTokens
-        WHERE (redeemer.userId == _$customer)
+        WHERE (redeemer == _$customer)
 }
 
 query selectAllRedeemedTokenTransactionsByProviderOrPartner {
     description: "Select all transactions where tokens that where redeemed are accepted by a provider or partner"
     statement: 
       SELECT loyaltynetwork.redeemTokens
-        WHERE (accepter.userId == _$provider)
+        WHERE (accepter == _$provider)
 }
 
 query selectAllJoinProgramTransactionsByCustomer{
     description: "Select all transactions where a customer joined a program"
     statement: 
       SELECT loyaltynetwork.joinProgram
-        WHERE (joiner.userId == _$customer)
+        WHERE (joiner == _$customer)
 }
 
 query selectAllJoinProgramTransactionsByProvider{
     description: "Select all transactions where a customer joined a program and where a particular provider is the program owner"
     statement: 
       SELECT loyaltynetwork.joinProgram
-        WHERE (programOwner.userId == _$provider)
+        WHERE (programOwner == _$provider)
 }
 
 query selectAllExitProgramTransactionsByCustomer{
     description: "Select all transactions where a customer left a program"
     statement: 
       SELECT loyaltynetwork.exitProgram
-        WHERE (exiter.userId == _$customer)
+        WHERE (exiter == _$customer)
 }
 
 query selectAllExitProgramTransactionsByProvider{
     description: "Select all transactions where where a customer left a program and where a particular provider is the program owner"
     statement:  
       SELECT loyaltynetwork.exitProgram
-        WHERE (programOwner.userId == _$provider)
+        WHERE (programOwner == _$provider)
 }
 
 query selectAllTradeTokenTransactionsByCustomer{
     description: "Select all transactions where tokens where traded by a customer"
     statement: 
       SELECT loyaltynetwork.tradeTokens
-        WHERE ((sender.userId == _$customer) OR (receiver == _$customer))
+        WHERE ((sender == _$customer) OR (receiver == _$customer))
 }
 
 query selectAllTokensFromProvider{
