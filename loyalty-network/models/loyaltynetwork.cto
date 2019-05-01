@@ -34,6 +34,7 @@ participant Customer extends User {
 participant LoyaltyProvider extends User{
   o String companyName
   --> LoyaltyPartner[] partners optional
+  --> LoyaltyPartner[] registrations optional
   --> Customer[] customers optional
   o Double conversionRate optional
 }
@@ -93,7 +94,7 @@ transaction returnIssuedTokensByProvider{
 }
 
 @commit(false)
-@returns(Transaction[])
+@returns(Array)
 transaction returnTransactionsByUser{
   o String role
   o String resourceString
