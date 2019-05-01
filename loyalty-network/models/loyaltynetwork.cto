@@ -98,12 +98,12 @@ transaction returnIssuedTokensByProvider{
   --> User issuer
 }
 
-@commit(false)
-@returns(Array)
-transaction returnTransactionsByUser{
-  o String role
-  o String resourceString
-}
+// @commit(false)
+// @returns(Transaction[])
+// transaction returnTransactionsByUser{
+//   o String role
+//   o String resourceString
+// }
 
 
 // @commit(false)
