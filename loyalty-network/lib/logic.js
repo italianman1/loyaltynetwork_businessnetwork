@@ -239,49 +239,49 @@ async function returnIssuedTokensByProvider(tx) {
 
 }
 
-/**
- * A transaction which returns the transaction of a particular user involved
- * @param {loyaltynetwork.returnTransactionsByUser} returnTransactionByUser
- * @returns {org.hyperledger.composer.system.Transaction[]} 
- * @transaction
- */
-async function returnTransactionsByUser(tx) {
-    let transactions = []; 
-    let allTransactions = await query('selectAllTransactions');
+// /**
+//  * A transaction which returns the transaction of a particular user involved
+//  * @param {loyaltynetwork.returnTransactionsByUser} returnTransactionByUser
+//  * @returns {org.hyperledger.composer.system.Transaction[]} 
+//  * @transaction
+//  */
+// async function returnTransactionsByUser(tx) {
+//     let transactions = []; 
+//     let allTransactions = await query('selectAllTransactions');
 
-    if(tx.role == "Customer") {
-        allTransactions.forEach(transaction => {
-            if(transaction.transactionType == "loyaltynetwork.joinProgram" || transaction.transactionType == "loyaltynetwork.exitProgram" || 
-            transaction.transactionType == "loyaltynetwork.earnTokens" || transaction.transactionType == "loyaltynetwork.redeemTokens"){
+//     if(tx.role == "Customer") {
+//         allTransactions.forEach(transaction => {
+//             if(transaction.transactionType == "loyaltynetwork.joinProgram" || transaction.transactionType == "loyaltynetwork.exitProgram" || 
+//             transaction.transactionType == "loyaltynetwork.earnTokens" || transaction.transactionType == "loyaltynetwork.redeemTokens"){
 
-            }
-        });
-        let allJoinTransactions = await query('selectAllJoinProgramTransactionsByCustomer', { customer: tx.resourceString});
-        let allExitTransactions = await query('selectAllExitProgramTransactionsByCustomer', { customer: tx.resourceString});
-        let allEarnTransactions = await query('selectAllEarnTokenTransactionsByCustomer', { customer: tx.resourceString});
-        let allRedeemTransactions = await query('selectAllRedeemedTokenTransactionsByCustomer', { customer: tx.resourceString});
-        let allTradeTransactions = await query('selectAllTradeTokenTransactionsByCustomer', { customer: tx.resourceString});
-        transactions.concat(allJoinTransactions, allExitTransactions, allEarnTransactions, allRedeemTransactions, allTradeTransactions);
-    }
+//             }
+//         });
+//         let allJoinTransactions = await query('selectAllJoinProgramTransactionsByCustomer', { customer: tx.resourceString});
+//         let allExitTransactions = await query('selectAllExitProgramTransactionsByCustomer', { customer: tx.resourceString});
+//         let allEarnTransactions = await query('selectAllEarnTokenTransactionsByCustomer', { customer: tx.resourceString});
+//         let allRedeemTransactions = await query('selectAllRedeemedTokenTransactionsByCustomer', { customer: tx.resourceString});
+//         let allTradeTransactions = await query('selectAllTradeTokenTransactionsByCustomer', { customer: tx.resourceString});
+//         transactions.concat(allJoinTransactions, allExitTransactions, allEarnTransactions, allRedeemTransactions, allTradeTransactions);
+//     }
 
-    if(tx.role == "Partner") {
-        let allEarnTransactions = await query('selectAllEarnTokenTransactionsByProviderOrPartner', { provider: tx.resourceString});
-        let allRedeemTransactions = await query('selectAllRedeemedTokenTransactionsByProviderOrPartner', { provider: tx.resourceString});
-        transactions.concat(allEarnTransactions, allRedeemTransactions);
-    }
+//     if(tx.role == "Partner") {
+//         let allEarnTransactions = await query('selectAllEarnTokenTransactionsByProviderOrPartner', { provider: tx.resourceString});
+//         let allRedeemTransactions = await query('selectAllRedeemedTokenTransactionsByProviderOrPartner', { provider: tx.resourceString});
+//         transactions.concat(allEarnTransactions, allRedeemTransactions);
+//     }
 
-    if(tx.role == "Provider") {
-        let allJoinTransactions = await query('selectAllJoinProgramTransactionsByProvider', { provider: tx.resourceString});
-        let allExitTransactions = await query('selectAllExitProgramTransactionsByProvider', { provider: tx.resourceString});
-        let allEarnTransactions = await query('selectAllEarnTokenTransactionsByProviderOrPartner', { provider: tx.resourceString});
-        let allRedeemTransactions = await query('selectAllRedeemedTokenTransactionsByProviderOrPartner', { provider: tx.resourceString});
-        let allIssueTransactions = await query('selectAllIssuedTokenTransactionsByProvider', { provider: tx.resourceString});
-        transactions.concat(allJoinTransactions, allExitTransactions, allEarnTransactions, allRedeemTransactions, allIssueTransactions);
-    }
+//     if(tx.role == "Provider") {
+//         let allJoinTransactions = await query('selectAllJoinProgramTransactionsByProvider', { provider: tx.resourceString});
+//         let allExitTransactions = await query('selectAllExitProgramTransactionsByProvider', { provider: tx.resourceString});
+//         let allEarnTransactions = await query('selectAllEarnTokenTransactionsByProviderOrPartner', { provider: tx.resourceString});
+//         let allRedeemTransactions = await query('selectAllRedeemedTokenTransactionsByProviderOrPartner', { provider: tx.resourceString});
+//         let allIssueTransactions = await query('selectAllIssuedTokenTransactionsByProvider', { provider: tx.resourceString});
+//         transactions.concat(allJoinTransactions, allExitTransactions, allEarnTransactions, allRedeemTransactions, allIssueTransactions);
+//     }
 
-    return transactions;
+//     return transactions;
 
-}
+// }
 
 /**
  * A transaction to initiate the network with some dummy data
