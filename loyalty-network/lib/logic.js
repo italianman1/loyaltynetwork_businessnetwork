@@ -156,6 +156,7 @@ async function joinProgram(tx) {
     }
 
     if(tx.joiner.role == "Partner"){
+        tx.programOwner.registrations.splice(tx.programOwner.registrations.indexOf(tx.joiner), 1);
         tx.programOwner.partners.push(tx.joiner);
         tx.joiner.provider = tx.programOwner;
         const partnerRegistry = await getParticipantRegistry('loyaltynetwork.LoyaltyPartner');
