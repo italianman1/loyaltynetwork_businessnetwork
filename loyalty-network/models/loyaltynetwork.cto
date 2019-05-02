@@ -83,6 +83,11 @@ transaction registerForAProgram {
   --> LoyaltyPartner register
 }
 
+transaction declineForAProgram {
+  --> LoyaltyProvider programOwner
+  --> LoyaltyPartner declinedPartner
+}
+
 transaction exitProgram {
   --> LoyaltyProvider programOwner
   --> User exiter
