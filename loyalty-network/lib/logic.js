@@ -210,7 +210,7 @@ async function exitProgram(tx) {
 
     if(tx.exiter.role == "Partner"){
         tx.programOwner.partners.splice(tx.programOwner.partners.indexOf(tx.exiter), 1);
-        tx.exiter.provider = {};
+        tx.exiter.provider = '';
         const partnerRegistry = await getParticipantRegistry('loyaltynetwork.LoyaltyPartner');
         await partnerRegistry.update(tx.exiter);
         const providerRegistry = await getParticipantRegistry('loyaltynetwork.LoyaltyProvider');
