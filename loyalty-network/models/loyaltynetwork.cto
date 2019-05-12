@@ -25,6 +25,11 @@ abstract participant User identified by userId {
   --> LoyaltyToken[] tokens optional
 }
 
+participant SolutionProvider identified by userId {
+  o String userId
+  o String role
+}
+
 participant Customer extends User {
   o String firstName
   o String lastName
@@ -53,12 +58,14 @@ asset LoyaltyToken identified by tokenId {
 transaction issueTokens{
   --> User issuer 
   o Integer issuedTokens
+  o Double amountOfEuros
 }
 
 transaction earnTokens{
   --> Customer earner
   o Integer earnedTokens
   --> User issuer
+  o Double amountOfEuros
 }
 
 transaction redeemTokens {
@@ -71,6 +78,7 @@ transaction tradeTokens {
   --> Customer sender
   --> Customer receiver
   o Integer amountOfTokens
+  o Double amountOfEuros
 }
 
 transaction joinProgram {
@@ -103,12 +111,11 @@ transaction returnIssuedTokensByProvider{
   --> User issuer
 }
 
-// @commit(false)
-// @returns(Transaction[])
-// transaction returnTransactionsByUser{
-//   o String role
-//   o String resourceString
-// }
+@commit(false)
+@returns(Transaction[])
+transaction returnTransactionsByUser{
+  --> User user
+}
 
 
 // @commit(false)
