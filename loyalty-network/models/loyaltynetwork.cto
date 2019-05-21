@@ -41,7 +41,9 @@ participant LoyaltyProvider extends User{
   --> LoyaltyPartner[] partners optional
   --> LoyaltyPartner[] registrations optional
   --> Customer[] customers optional
-  o Double conversionRate optional
+  o Integer conversionRate optional
+  o Integer amountOfRedeemedTokensInEuros optional
+  o Integer amountOfIssuedTokensInEuros optional
 }
 
 participant LoyaltyPartner extends User{
@@ -56,21 +58,20 @@ asset LoyaltyToken identified by tokenId {
 }
 
 transaction issueTokens{
-  --> User issuer 
+  --> LoyaltyProvider issuer 
   o Integer issuedTokens
-  o Double amountOfEuros
+  o Integer amountOfEuros
 }
 
 transaction earnTokens{
   --> Customer earner
-  o Integer earnedTokens
   --> User issuer
-  o Double amountOfEuros
+  o Integer amountOfEuros
 }
 
 transaction redeemTokens {
   --> Customer redeemer
-  o Integer redeemedTokens
+  o Integer amountOfDiscount
   --> User accepter
 }
 
@@ -78,7 +79,7 @@ transaction tradeTokens {
   --> Customer sender
   --> Customer receiver
   o Integer amountOfTokens
-  o Double amountOfEuros
+  o Integer amountOfEuros
 }
 
 transaction joinProgram {
