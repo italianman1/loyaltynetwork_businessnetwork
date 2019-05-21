@@ -27,18 +27,27 @@ async function issueTokens(tx) {
     const factory = getFactory();
     const tokenAssetRegistry = await getAssetRegistry('loyaltynetwork.LoyaltyToken');
     const participantRegistry = await getParticipantRegistry('loyaltynetwork.LoyaltyProvider');
-    var allTokens = await tokenAssetRegistry.getAll();
+    let allTokens = await tokenAssetRegistry.getAll();
     let i;
+    let highestIdNumber = 0;
+
+    for(i = 0; i < allTokens.length; i++){ 
+      let idNumber = parseInt(allTokens[i].tokenId.split('#')[1], 10);
+      if(idNumber > highestIdNumber){
+        highestIdNumber = idNumber;
+      }
+    }
 
     for(i = 1; i <= tx.issuedTokens; i++){
-        var idNumber = allTokens.length + i;
-        var token = factory.newResource('loyaltynetwork', 'LoyaltyToken', 'Token' + idNumber.toString());
+        let idNumber = highestIdNumber + i;
+        let token = factory.newResource('loyaltynetwork', 'LoyaltyToken', 'Token#' + idNumber.toString());
         token.owner = tx.issuer;
         token.issuer = tx.issuer;
         await tokenAssetRegistry.add(token);
         tx.issuer.tokens.push(token);
     }
-   
+
+    tx.issuer.amountOfIssuedTokensInEuros += tx.amountOfEuros;
     await participantRegistry.update(tx.issuer);
 
     // Emit an event for the modified asset.
@@ -55,21 +64,73 @@ async function issueTokens(tx) {
  * @transaction
  */
 async function earnTokens(tx) {
-    let i; 
+    let amountOfTokensThatAreEarned = 0; 
+    let amountOfTokensToBeEarned;
+    let amountOfTokensInReserve;
     const assetRegistry = await getAssetRegistry('loyaltynetwork.LoyaltyToken');
     const customerRegistry = await getParticipantRegistry('loyaltynetwork.Customer');
     const providerRegistry = await getParticipantRegistry('loyaltynetwork.LoyaltyProvider');
 
-    for(i = 0; i< tx.earnedTokens; i++){
-        var token = tx.issuer.tokens.pop();
-        token.owner = tx.earner;
-        await assetRegistry.update(token);
-        tx.earner.tokens.push(token);
+    //calculate the amount of earned tokens from the amount of euros 
+    if(tx.issuer.role == "Provider") {
+        amountOfTokensToBeEarned = tx.amountOfEuros * tx.issuer.conversionRate;
+        amountOfTokensInReserve = tx.issuer.tokens.length;
+
+        if(amountOfTokensInReserve < amountOfTokensToBeEarned){
+            throw new Error('The token reserve is not enough to give out the tokens');
+        }
+
+        if(amountOfTokensInReserve >= amountOfTokensToBeEarned){
+            for(i = 0; i < amountOfTokensInReserve; i++){
+                let token = tx.issuer.tokens[i];
+                if(token && token.issuer.userId == tx.issuer.userId){
+                    tx.issuer.tokens.splice(i, 1);
+                    token.owner = tx.earner;
+                    await assetRegistry.update(token);
+                    tx.earner.tokens.push(token);
+                    await customerRegistry.update(tx.earner);
+                    await providerRegistry.update(tx.issuer);
+                    amountOfTokensThatAreEarned++;
+                    i--;
+                }
+    
+                if(amountOfTokensThatAreEarned >= amountOfTokensToBeEarned){
+                    return;
+                }
+            }
+        }
     }
 
-    await customerRegistry.update(tx.earner);
-    await providerRegistry.update(tx.issuer);
+    if(tx.issuer.role == "Partner"){
+        amountOfTokensToBeEarned = tx.amountOfEuros * tx.issuer.provider.conversionRate;
+        amountOfTokensInReserve = tx.issuer.provider.tokens.length;
 
+        if(amountOfTokensInReserve < amountOfTokensToBeEarned){
+            throw new Error('The token reserve is not enough to give out the tokens');
+        }
+
+        if(amountOfTokensInReserve >= amountOfTokensToBeEarned){
+            for(i = 0; i < amountOfTokensInReserve; i++){
+                let token = tx.issuer.provider.tokens[i];
+                if(token && token.issuer.userId == tx.issuer.provider.userId){
+                    tx.issuer.provider.tokens.splice(i, 1);
+                    token.owner = tx.earner;
+                    await assetRegistry.update(token);
+                    tx.earner.tokens.push(token);
+                    await customerRegistry.update(tx.earner);
+                    await providerRegistry.update(tx.issuer.provider);
+                    amountOfTokensThatAreEarned++;
+                    i--;
+                }
+    
+                if(amountOfTokensThatAreEarned >= amountOfTokensToBeEarned){
+                    return;
+                }
+            }
+        }
+    }
+
+    
 }
 
 /**
@@ -78,65 +139,89 @@ async function earnTokens(tx) {
  * @transaction
  */
 async function redeemTokens(tx) {
-    let i; 
-    let tokensRedeemed;
+    let EurosThatAreRedeemed = 0;
+    let EurosToBeRedeemed = 0;
+    let totalTokenValue = 0;
+    let amountOfTokensInReserve = 0;
     const assetRegistry = await getAssetRegistry('loyaltynetwork.LoyaltyToken');
     const customerRegistry = await getParticipantRegistry('loyaltynetwork.Customer');
     const providerRegistry = await getParticipantRegistry('loyaltynetwork.LoyaltyProvider');
-    const partnerRegistry = await getParticipantRegistry('loyaltynetwork.LoyaltyPartner');
 
-    if(tx.redeemer.tokens.length < tx.redeemedTokens){
-        throw new Error('Insufficient tokens to redeem');
+    //calculate the amount of the tokens to be redeemed from the amount of euros 
+    EurosToBeRedeemed = tx.amountOfDiscount;
+    amountOfTokensInReserve = tx.redeemer.tokens.length;
+
+    //calculate the total worth of tokens 
+    for(i = 0; i < amountOfTokensInReserve; i++) {
+        let token = tx.redeemer.tokens[i];
+        if(token){
+            totalTokenValue += 1 / token.issuer.conversionRate; 
+        }
     }
 
-    if(tx.redeemer.tokens.length >= tx.redeemedTokens){
-        for(i = 0; i < tx.redeemedTokens; i++){
-            var token = tx.redeemer.tokens.pop();
-            if(token.issuer.userId == accepter.userId){
-                token.owner = tx.accepter;
-                await assetRegistry.update(token);
-                tx.accepter.tokens.push(token);
-                tokensRedeemed++;
-            }
-        }
-
-        if(tokensRedeemed >= tx.redeemedTokens){
-            if(tx.accepter.role == "Partner"){
-                await partnerRegistry.update(tx.accepter);
-            }
-    
-            
-            if(tx.accepter.role == "Provider"){
-                await providerRegistry.update(tx.accepter);
-            }
-           
-            await customerRegistry.update(tx.redeemer);
-        }
-
-        if(tokensRedeemed < tx.redeemedTokens){
-            for(i = 0; i < tx.redeemedTokens - tokensRedeemed; i++){
-                var token = tx.redeemer.tokens.pop();
-                i += token.issuer.conversionRate / token.issuer.conversionRate;
-                token.owner = tx.accepter;
-                await assetRegistry.update(token);
-                tx.accepter.tokens.push(token);
-            }
-
-            if(tx.accepter.role == "Partner"){
-                await partnerRegistry.update(tx.accepter);
-            }
-            
-            if(tx.accepter.role == "Provider"){
-                await providerRegistry.update(tx.accepter);
-            }
-           
-            await customerRegistry.update(tx.redeemer);
-        }
-
-       
+    if(totalTokenValue < EurosToBeRedeemed){
+        throw new Error('The value of the tokens alltogether is insufficient to get the discount');
     }
 
-    
+    if(tx.accepter.role == "Provider" && totalTokenValue >= EurosToBeRedeemed) {
+        for(i = 0; i < amountOfTokensInReserve; i++){
+            let token = tx.redeemer.tokens[i];
+            if(token && token.issuer.userId == tx.accepter.userId && EurosThatAreRedeemed < EurosToBeRedeemed){
+                tx.redeemer.tokens.splice(i, 1);
+                EurosThatAreRedeemed += 1 / token.issuer.conversionRate;
+                await assetRegistry.remove(token);
+                i--;
+            }
+
+            if(EurosThatAreRedeemed >= EurosToBeRedeemed){
+                return;
+            }
+        }
+
+        if(EurosThatAreRedeemed < EurosToBeRedeemed){
+            for(i = 0; i < amountOfTokensInReserve; i++) {
+                let token = tx.redeemer.tokens[i];
+                if(token && EurosThatAreRedeemed < EurosToBeRedeemed){
+                    tx.redeemer.tokens.splice(i, 1);
+                    EurosThatAreRedeemed += 1 / token.issuer.conversionRate;
+                    await assetRegistry.remove(token);
+                    i--;
+                }
+            }
+        } 
+
+        tx.accepter.amountOfRedeemedTokensInEuros += EurosThatAreRedeemed;
+        await providerRegistry.update(tx.accepter);
+    }
+
+    if(tx.accepter.role == "Partner" && totalTokenValue >= EurosToBeRedeemed) {
+        for(i = 0; i < amountOfTokensInReserve; i++) {
+            let token = tx.redeemer.tokens[i];
+            if(token && token.issuer.userId == tx.accepter.provider.userId && EurosThatAreRedeemed < EurosToBeRedeemed){
+                tx.redeemer.tokens.splice(i, 1);
+                EurosThatAreRedeemed += 1 / token.issuer.conversionRate;
+                await assetRegistry.remove(token);
+                i--;
+            }
+        }
+
+        if(EurosThatAreRedeemed < EurosToBeRedeemed) {
+            for(i = 0; i < amountOfTokensInReserve; i++) {
+                let token = tx.redeemer.tokens[i];
+                if(token && EurosThatAreRedeemed < EurosToBeRedeemed){
+                    tx.redeemer.tokens.splice(i, 1);
+                    EurosThatAreRedeemed += 1 / token.issuer.conversionRate;
+                    await assetRegistry.remove(token);
+                    i--;
+                }
+            }
+        } 
+        
+        tx.accepter.provider.amountOfRedeemedTokensInEuros += EurosThatAreRedeemed;
+        await providerRegistry.update(tx.accepter.provider);
+    }
+   
+    await customerRegistry.update(tx.redeemer);
 }
 
 /**
@@ -155,7 +240,7 @@ async function tradeTokens(tx) {
 
     if(tx.sender.tokens.length >= tx.amountOfTokens){
         for(i = 0; i< tx.amountOfTokens; i++){
-            var token = tx.sender.tokens.pop();
+            let token = tx.sender.tokens.pop();
             token.owner = tx.receiver;     
             await assetRegistry.update(token);
             tx.receiver.tokens.push(token);
@@ -254,7 +339,7 @@ async function exitProgram(tx) {
  * @transaction
  */
 async function returnIssuedTokensByProvider(tx) {
-    var transactionArray = await query('selectAllIssuedTokenTransactions');
+    const transactionArray = await query('selectAllIssuedTokenTransactions');
     let totalIssuedTokens = 0;
     let i;
 
@@ -366,19 +451,11 @@ async function returnTransactionsByUser(tx) {
  */
 async function initiateNetwork(tx) {
     //retrieving registries and factories to create and add the different resources
-    const tokenRegistry = await getAssetRegistry('loyaltynetwork.LoyaltyToken');
     const customerRegistry = await getParticipantRegistry('loyaltynetwork.Customer');
     const partnerRegistry = await getParticipantRegistry('loyaltynetwork.LoyaltyPartner');
     const providerRegistry = await getParticipantRegistry('loyaltynetwork.LoyaltyProvider');
     const solutionProviderRegistry = await getParticipantRegistry('loyaltynetwork.SolutionProvider');
     const factory = getFactory();
-
-    //adding tokens
-    var token1 = factory.newResource('loyaltynetwork', 'LoyaltyToken', 'Token1');
-    var token2 = factory.newResource('loyaltynetwork', 'LoyaltyToken', 'Token2');
-    var token3 = factory.newResource('loyaltynetwork', 'LoyaltyToken', 'Token3');
-    var token4 = factory.newResource('loyaltynetwork', 'LoyaltyToken', 'Token4');
-    var token5 = factory.newResource('loyaltynetwork', 'LoyaltyToken', 'Token5');
 
     //adding solutionprovider
     var solutionprovider1 = factory.newResource('loyaltynetwork', 'SolutionProvider', 'Ctac0')
@@ -408,7 +485,7 @@ async function initiateNetwork(tx) {
     customer3.role = "Customer";
     customer3.tokens = [];
     customer3.providers = [];
-    
+
     //adding partners
     var partner1 = factory.newResource('loyaltynetwork', 'LoyaltyPartner', 'Keeskroket1');
     partner1.companyName = "Kees Kroket";
@@ -422,60 +499,38 @@ async function initiateNetwork(tx) {
     partner2.email = "hans@gmail.com";
     partner2.role = "Partner";
     partner2.tokens = [];
-    partner2.provider = provider1;
+    partner2.provider = provider2;    
 
     //adding providers
     var provider1 = factory.newResource('loyaltynetwork', 'LoyaltyProvider', 'Action0');
     provider1.companyName = "Action";
-    provider1.partners = [];
+    provider1.partners = [partner1];
     provider1.customers = [customer1, customer2, customer3]
     provider1.email = "action@gmail.com";
     provider1.role = "Provider";
     provider1.tokens = [];
     provider1.registrations = [];
     provider1.conversionRate = 1;
+    provider1.amountOfRedeemedTokensInEuros = 0;
+    provider1.amountOfIssuedTokensInEuros = 0;
 
-     //adding providers
-     var provider2 = factory.newResource('loyaltynetwork', 'LoyaltyProvider', 'Praxis0');
-     provider2.companyName = "Praxis";
-     provider2.partners = [];
-     provider2.customers = []
-     provider2.email = "praxis@gmail.com";
-     provider2.role = "Provider";
-     provider2.tokens = [];
-     provider2.registrations = [];
-     provider2.conversionRate = 5;
-
-    //adding the provider to the customers and partners
-    partner1.provider = provider1;
-    partner2.provider = provider1;
-    customer1.providers = [provider1];
-    customer2.providers = [provider1];
-    customer3.providers = [provider1];
-    partner1.tokens = [token1];
-    partner2.tokens = [token2];
-    customer1.tokens = [token3];
-    customer2.tokens = [token4];
-    customer3.tokens = [token5];
-
-    //adding owner and issuers to the tokens
-    token1.owner = partner1;
-    token2.owner = partner2;
-    token3.owner = customer1;
-    token4.owner = customer2;
-    token5.owner = customer3;
-    token1.issuer = provider1;
-    token2.issuer = provider1;
-    token3.issuer = provider1;
-    token4.issuer = provider1;
-    token5.issuer = provider1;
-
+    var provider2 = factory.newResource('loyaltynetwork', 'LoyaltyProvider', 'Praxis0');
+    provider2.companyName = "Praxis";
+    provider2.partners = [partner2];
+    provider2.customers = []
+    provider2.email = "praxis@gmail.com";
+    provider2.role = "Provider";
+    provider2.tokens = [];
+    provider2.registrations = [];
+    provider2.conversionRate = 5;
+    provider2.amountOfRedeemedTokensInEuros = 0;
+    provider2.amountOfIssuedTokensInEuros = 0;
+    
 
     //adding everything to the network
     await customerRegistry.addAll([customer1, customer2, customer3]);
     await partnerRegistry.addAll([partner1, partner2]);
     await providerRegistry.addAll([provider1, provider2]);
     await solutionProviderRegistry.add(solutionprovider1);
-    await tokenRegistry.addAll([token1, token2, token3, token4, token5]);
 }
 
