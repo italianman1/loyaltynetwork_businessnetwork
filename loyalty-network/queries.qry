@@ -61,7 +61,6 @@ query returnLoyaltyProvidersByCustomer {
             WHERE (customers CONTAINS _$selected_customer)
 }
 
-
 query returnLoyaltyProvidersByPartner {
     description: "Select all providers who have a particular partner"
     statement:
@@ -82,10 +81,74 @@ query selectTransaction{
           WHERE (transactionId == _$transaction_Id)
 }
 
-query selectAllIssuedTokenTransactions{
-    description: "Select all transactions where tokens where issued"
+query selectAllTradeTokenTransactionsByCustomer{
+    description: "Select all transactions where tokens where traded by a customer"
     statement: 
+      SELECT loyaltynetwork.tradeTokens
+        WHERE ((sender == _$customer) OR (receiver == _$customer))
+}
+
+query selectAllTokensFromProvider{
+    description: "Select all tokens from a particular customer which were issued by a particular provider"
+    statement: 
+      SELECT loyaltynetwork.LoyaltyToken
+        WHERE ((owner == _$owner_id) AND (issuer == _$issuer_id))
+}
+
+query selectEarnTokensTransaction {
+    description: "Select all transactions where tokens are earned"
+    statement:
+      SELECT loyaltynetwork.earnTokens
+        WHERE (transactionId == _$id)
+}
+
+query selectRedeemTokensTransaction {
+    description: "Select all transactions where tokens are redeemed"
+    statement:
+      SELECT loyaltynetwork.redeemTokens
+       WHERE (transactionId == _$id)
+}
+
+query selectIssueTokensTransaction {
+    description: "Select all transactions where tokens are redeemed"
+    statement:
       SELECT loyaltynetwork.issueTokens
+       WHERE (transactionId == _$id)
+}
+
+query selectTradeTokensTransaction {
+    description: "Select all transactions where tokens are redeemed"
+    statement:
+      SELECT loyaltynetwork.tradeTokens
+       WHERE (transactionId == _$id)
+}
+
+query selectJoinProgramTransaction {
+    description: "Select all transactions where participants join a program"
+    statement:
+      SELECT loyaltynetwork.joinProgram
+       WHERE (transactionId == _$id)
+}
+
+query selectExitProgramTransaction {
+    description: "Select all transactions where participants exit a program"
+    statement:
+      SELECT loyaltynetwork.exitProgram
+       WHERE (transactionId == _$id)
+}
+
+query selectRegisterProgramTransaction {
+    description: "Select all transactions where participants register for a program"
+    statement:
+      SELECT loyaltynetwork.registerForAProgram
+       WHERE (transactionId == _$id)
+}
+
+query selectDeclineProgramTransaction {
+    description: "Select all transactions where participants decline for a program"
+    statement:
+      SELECT loyaltynetwork.declineForAProgram
+       WHERE (transactionId == _$id)
 }
 
 

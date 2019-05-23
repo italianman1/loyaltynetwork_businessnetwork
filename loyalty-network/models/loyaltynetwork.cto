@@ -25,6 +25,11 @@ abstract participant User identified by userId {
   --> LoyaltyToken[] tokens optional
 }
 
+participant SolutionProvider identified by userId {
+  o String userId
+  o String role
+}
+
 participant Customer extends User {
   o String firstName
   o String lastName
@@ -34,8 +39,11 @@ participant Customer extends User {
 participant LoyaltyProvider extends User{
   o String companyName
   --> LoyaltyPartner[] partners optional
+  --> LoyaltyPartner[] registrations optional
   --> Customer[] customers optional
-  o Double conversionRate optional
+  o Integer conversionRate optional
+  o Integer amountOfRedeemedTokensInEuros optional
+  o Integer amountOfIssuedTokensInEuros optional
 }
 
 participant LoyaltyPartner extends User{
@@ -45,23 +53,25 @@ participant LoyaltyPartner extends User{
 
 asset LoyaltyToken identified by tokenId {
   o String tokenId
-  --> User owner 
+  --> User owner
+  --> LoyaltyProvider issuer
 }
 
 transaction issueTokens{
-  --> User issuer 
+  --> LoyaltyProvider issuer 
   o Integer issuedTokens
+  o Integer amountOfEuros
 }
 
 transaction earnTokens{
   --> Customer earner
-  o Integer earnedTokens
   --> User issuer
+  o Integer amountOfEuros
 }
 
 transaction redeemTokens {
   --> Customer redeemer
-  o Integer redeemedTokens
+  o Integer amountOfDiscount
   --> User accepter
 }
 
@@ -69,11 +79,22 @@ transaction tradeTokens {
   --> Customer sender
   --> Customer receiver
   o Integer amountOfTokens
+  o Integer amountOfEuros
 }
 
 transaction joinProgram {
   --> LoyaltyProvider programOwner
   --> User joiner
+}
+
+transaction registerForAProgram {
+  --> LoyaltyProvider programOwner
+  --> LoyaltyPartner register
+}
+
+transaction declineForAProgram {
+  --> LoyaltyProvider programOwner
+  --> LoyaltyPartner declinedPartner
 }
 
 transaction exitProgram {
@@ -89,6 +110,12 @@ transaction initiateNetwork{
 @returns(Integer)
 transaction returnIssuedTokensByProvider{
   --> User issuer
+}
+
+@commit(false)
+@returns(Transaction[])
+transaction returnTransactionsByUser{
+  --> User user
 }
 
 
