@@ -163,7 +163,7 @@ async function redeemTokens(tx) {
         throw new Error('The value of the tokens alltogether is insufficient to get the discount');
     }
 
-    if(tx.accepter.role == "Provider" && totalTokenValue >= EurosToBeRedeemed) {
+    if(tx.accepter.role == "Provider") {
         for(i = 0; i < amountOfTokensInReserve; i++){
             let token = tx.redeemer.tokens[i];
             if(token && token.issuer.userId == tx.accepter.userId && EurosThatAreRedeemed < EurosToBeRedeemed){
@@ -194,7 +194,7 @@ async function redeemTokens(tx) {
         await providerRegistry.update(tx.accepter);
     }
 
-    if(tx.accepter.role == "Partner" && totalTokenValue >= EurosToBeRedeemed) {
+    if(tx.accepter.role == "Partner") {
         for(i = 0; i < amountOfTokensInReserve; i++) {
             let token = tx.redeemer.tokens[i];
             if(token && token.issuer.userId == tx.accepter.provider.userId && EurosThatAreRedeemed < EurosToBeRedeemed){
@@ -468,7 +468,7 @@ async function initiateNetwork(tx) {
     customer1.email = "henk@gmail.com";
     customer1.role = "Customer";
     customer1.tokens = [];
-    customer1.providers = [];
+    customer1.providers = [provider1];
 
     var customer2 = factory.newResource('loyaltynetwork', 'Customer', 'Kees1');
     customer2.firstName = "Kees";
@@ -476,7 +476,7 @@ async function initiateNetwork(tx) {
     customer2.email = "kees.boer@gmail.com";
     customer2.role = "Customer";
     customer2.tokens = [];
-    customer2.providers = [];
+    customer2.providers = [provider1];
 
     var customer3 = factory.newResource('loyaltynetwork', 'Customer', 'Piet1');
     customer3.firstName = "Piet";
@@ -484,7 +484,7 @@ async function initiateNetwork(tx) {
     customer3.email = "piet@gmail.com"
     customer3.role = "Customer";
     customer3.tokens = [];
-    customer3.providers = [];
+    customer3.providers = [provider2];
 
     //adding partners
     var partner1 = factory.newResource('loyaltynetwork', 'LoyaltyPartner', 'Keeskroket1');
@@ -505,7 +505,7 @@ async function initiateNetwork(tx) {
     var provider1 = factory.newResource('loyaltynetwork', 'LoyaltyProvider', 'Action0');
     provider1.companyName = "Action";
     provider1.partners = [partner1];
-    provider1.customers = [customer1, customer2, customer3]
+    provider1.customers = [customer1, customer2]
     provider1.email = "action@gmail.com";
     provider1.role = "Provider";
     provider1.tokens = [];
@@ -517,7 +517,7 @@ async function initiateNetwork(tx) {
     var provider2 = factory.newResource('loyaltynetwork', 'LoyaltyProvider', 'Praxis0');
     provider2.companyName = "Praxis";
     provider2.partners = [partner2];
-    provider2.customers = []
+    provider2.customers = [customer3]
     provider2.email = "praxis@gmail.com";
     provider2.role = "Provider";
     provider2.tokens = [];

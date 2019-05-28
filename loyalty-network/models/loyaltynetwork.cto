@@ -21,13 +21,20 @@ namespace loyaltynetwork
 abstract participant User identified by userId {
   o String userId
   o String email
-  o String role
+  o Role role
   --> LoyaltyToken[] tokens optional
+}
+
+enum Role {
+  o SolutionProvider
+  o Customer
+  o Partner
+  o Provider
 }
 
 participant SolutionProvider identified by userId {
   o String userId
-  o String role
+  o Role role
 }
 
 participant Customer extends User {
