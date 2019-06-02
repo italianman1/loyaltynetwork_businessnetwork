@@ -72,14 +72,16 @@ transaction issueTokens{
 
 transaction earnTokens{
   --> Customer earner
-  --> User issuer
+  --> LoyaltyProvider issuer
+  o String partnerStore
   o Integer amountOfEuros
 }
 
 transaction redeemTokens {
   --> Customer redeemer
   o Integer amountOfDiscount
-  --> User accepter
+  --> LoyaltyProvider accepter
+  o String partnerStore
 }
 
 transaction tradeTokens {

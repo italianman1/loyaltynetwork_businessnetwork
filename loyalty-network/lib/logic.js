@@ -72,7 +72,6 @@ async function earnTokens(tx) {
     const providerRegistry = await getParticipantRegistry('loyaltynetwork.LoyaltyProvider');
 
     //calculate the amount of earned tokens from the amount of euros 
-    if(tx.issuer.role == "Provider") {
         amountOfTokensToBeEarned = tx.amountOfEuros * tx.issuer.conversionRate;
         amountOfTokensInReserve = tx.issuer.tokens.length;
 
@@ -100,38 +99,6 @@ async function earnTokens(tx) {
             }
         }
     }
-
-    if(tx.issuer.role == "Partner"){
-        amountOfTokensToBeEarned = tx.amountOfEuros * tx.issuer.provider.conversionRate;
-        amountOfTokensInReserve = tx.issuer.provider.tokens.length;
-
-        if(amountOfTokensInReserve < amountOfTokensToBeEarned){
-            throw new Error('The token reserve is not enough to give out the tokens');
-        }
-
-        if(amountOfTokensInReserve >= amountOfTokensToBeEarned){
-            for(i = 0; i < amountOfTokensInReserve; i++){
-                let token = tx.issuer.provider.tokens[i];
-                if(token && token.issuer.userId == tx.issuer.provider.userId){
-                    tx.issuer.provider.tokens.splice(i, 1);
-                    token.owner = tx.earner;
-                    await assetRegistry.update(token);
-                    tx.earner.tokens.push(token);
-                    await customerRegistry.update(tx.earner);
-                    await providerRegistry.update(tx.issuer.provider);
-                    amountOfTokensThatAreEarned++;
-                    i--;
-                }
-    
-                if(amountOfTokensThatAreEarned >= amountOfTokensToBeEarned){
-                    return;
-                }
-            }
-        }
-    }
-
-    
-}
 
 /**
  * A redeem transaction when a customer wants to redeem his/her tokens at a Partner or a Provider
@@ -163,63 +130,35 @@ async function redeemTokens(tx) {
         throw new Error('The value of the tokens alltogether is insufficient to get the discount');
     }
 
-    if(tx.accepter.role == "Provider") {
-        for(i = 0; i < amountOfTokensInReserve; i++){
-            let token = tx.redeemer.tokens[i];
-            if(token && token.issuer.userId == tx.accepter.userId && EurosThatAreRedeemed < EurosToBeRedeemed){
-                tx.redeemer.tokens.splice(i, 1);
-                EurosThatAreRedeemed += 1 / token.issuer.conversionRate;
-                await assetRegistry.remove(token);
-                i--;
-            }
-
-            if(EurosThatAreRedeemed >= EurosToBeRedeemed){
-                return;
-            }
+    for(i = 0; i < amountOfTokensInReserve; i++){
+        let token = tx.redeemer.tokens[i];
+        if(token && token.issuer.userId == tx.accepter.userId && EurosThatAreRedeemed < EurosToBeRedeemed){
+            tx.redeemer.tokens.splice(i, 1);
+            EurosThatAreRedeemed += 1 / token.issuer.conversionRate;
+            await assetRegistry.remove(token);
+            i--;
         }
 
-        if(EurosThatAreRedeemed < EurosToBeRedeemed){
-            for(i = 0; i < amountOfTokensInReserve; i++) {
-                let token = tx.redeemer.tokens[i];
-                if(token && EurosThatAreRedeemed < EurosToBeRedeemed){
-                    tx.redeemer.tokens.splice(i, 1);
-                    EurosThatAreRedeemed += 1 / token.issuer.conversionRate;
-                    await assetRegistry.remove(token);
-                    i--;
-                }
-            }
-        } 
-
-        tx.accepter.amountOfRedeemedTokensInEuros += EurosThatAreRedeemed;
-        await providerRegistry.update(tx.accepter);
+        if(EurosThatAreRedeemed >= EurosToBeRedeemed){
+            return;
+        }
     }
 
-    if(tx.accepter.role == "Partner") {
+    if(EurosThatAreRedeemed < EurosToBeRedeemed){
         for(i = 0; i < amountOfTokensInReserve; i++) {
             let token = tx.redeemer.tokens[i];
-            if(token && token.issuer.userId == tx.accepter.provider.userId && EurosThatAreRedeemed < EurosToBeRedeemed){
+            if(token && EurosThatAreRedeemed < EurosToBeRedeemed){
                 tx.redeemer.tokens.splice(i, 1);
                 EurosThatAreRedeemed += 1 / token.issuer.conversionRate;
                 await assetRegistry.remove(token);
                 i--;
             }
         }
+    } 
 
-        if(EurosThatAreRedeemed < EurosToBeRedeemed) {
-            for(i = 0; i < amountOfTokensInReserve; i++) {
-                let token = tx.redeemer.tokens[i];
-                if(token && EurosThatAreRedeemed < EurosToBeRedeemed){
-                    tx.redeemer.tokens.splice(i, 1);
-                    EurosThatAreRedeemed += 1 / token.issuer.conversionRate;
-                    await assetRegistry.remove(token);
-                    i--;
-                }
-            }
-        } 
-        
-        tx.accepter.provider.amountOfRedeemedTokensInEuros += EurosThatAreRedeemed;
-        await providerRegistry.update(tx.accepter.provider);
-    }
+    tx.accepter.amountOfRedeemedTokensInEuros += EurosThatAreRedeemed;
+    await providerRegistry.update(tx.accepter);
+    
    
     await customerRegistry.update(tx.redeemer);
 }
@@ -457,12 +396,22 @@ async function initiateNetwork(tx) {
     const solutionProviderRegistry = await getParticipantRegistry('loyaltynetwork.SolutionProvider');
     const factory = getFactory();
 
-    //adding solutionprovider
+    //create every instance
     var solutionprovider1 = factory.newResource('loyaltynetwork', 'SolutionProvider', 'Ctac0')
+    var customer1 = factory.newResource('loyaltynetwork', 'Customer', 'Henk1');
+    var customer2 = factory.newResource('loyaltynetwork', 'Customer', 'Kees1');
+    var customer3 = factory.newResource('loyaltynetwork', 'Customer', 'Piet1');
+    var partner1 = factory.newResource('loyaltynetwork', 'LoyaltyPartner', 'Keeskroket1');
+    var partner2 = factory.newResource('loyaltynetwork', 'LoyaltyPartner', 'Hanscurryworst1');
+    var provider1 = factory.newResource('loyaltynetwork', 'LoyaltyProvider', 'Action0');
+    var provider2 = factory.newResource('loyaltynetwork', 'LoyaltyProvider', 'Praxis0');
+
     solutionprovider1.role = "SolutionProvider";
 
-    //adding customers
-    var customer1 = factory.newResource('loyaltynetwork', 'Customer', 'Henk1');
+    //add solutionprovider to the network
+    await solutionProviderRegistry.add(solutionprovider1);
+
+    //editing the customers
     customer1.firstName = "Henk";
     customer1.lastName = "Sentjens";
     customer1.email = "henk@gmail.com";
@@ -470,7 +419,6 @@ async function initiateNetwork(tx) {
     customer1.tokens = [];
     customer1.providers = [provider1];
 
-    var customer2 = factory.newResource('loyaltynetwork', 'Customer', 'Kees1');
     customer2.firstName = "Kees";
     customer2.lastName = "Boer";
     customer2.email = "kees.boer@gmail.com";
@@ -478,59 +426,95 @@ async function initiateNetwork(tx) {
     customer2.tokens = [];
     customer2.providers = [provider1];
 
-    var customer3 = factory.newResource('loyaltynetwork', 'Customer', 'Piet1');
-    customer3.firstName = "Piet";
-    customer3.lastName = "Oosterhout";
-    customer3.email = "piet@gmail.com"
-    customer3.role = "Customer";
-    customer3.tokens = [];
-    customer3.providers = [provider2];
-
-    //adding partners
-    var partner1 = factory.newResource('loyaltynetwork', 'LoyaltyPartner', 'Keeskroket1');
+    //editing partner
     partner1.companyName = "Kees Kroket";
     partner1.email = "kees.kroket@gmail.com";
     partner1.role = "Partner";
     partner1.tokens = [];
     partner1.provider = provider1;
 
-    var partner2 = factory.newResource('loyaltynetwork', 'LoyaltyPartner', 'Hanscurryworst1');
-    partner2.companyName = "Hans Curryworst";
-    partner2.email = "hans@gmail.com";
-    partner2.role = "Partner";
-    partner2.tokens = [];
-    partner2.provider = provider2;    
-
-    //adding providers
-    var provider1 = factory.newResource('loyaltynetwork', 'LoyaltyProvider', 'Action0');
+    //editing provider
     provider1.companyName = "Action";
-    provider1.partners = [partner1];
-    provider1.customers = [customer1, customer2]
     provider1.email = "action@gmail.com";
     provider1.role = "Provider";
+    provider1.partners = [partner1];
+    provider1.customers = [customer1, customer2];
     provider1.tokens = [];
     provider1.registrations = [];
     provider1.conversionRate = 1;
     provider1.amountOfRedeemedTokensInEuros = 0;
     provider1.amountOfIssuedTokensInEuros = 0;
 
-    var provider2 = factory.newResource('loyaltynetwork', 'LoyaltyProvider', 'Praxis0');
+     //adding the customers to the blockchain network
+     await customerRegistry.addAll([customer1, customer2]);
+     await partnerRegistry.add(partner1);
+     await providerRegistry.add(provider1);
+
+
+    //editing customer3
+    customer3.firstName = "Piet";
+    customer3.lastName = "Oosterhout";
+    customer3.email = "piet@gmail.com"
+    customer3.role = "Customer";
+    customer3.tokens = [];
+    customer3.providers = [provider2];
+    
+    //editing partner2
+    partner2.companyName = "Hans Curryworst";
+    partner2.email = "hans@gmail.com";
+    partner2.role = "Partner";
+    partner2.tokens = []; 
+    partner2.provider = provider2;
+
+   
+    //editing provider2
     provider2.companyName = "Praxis";
-    provider2.partners = [partner2];
-    provider2.customers = [customer3]
     provider2.email = "praxis@gmail.com";
     provider2.role = "Provider";
+    provider2.partners = [partner2];
+    provider2.customers = [customer3];
     provider2.tokens = [];
     provider2.registrations = [];
     provider2.conversionRate = 5;
     provider2.amountOfRedeemedTokensInEuros = 0;
     provider2.amountOfIssuedTokensInEuros = 0;
-    
 
-    //adding everything to the network
-    await customerRegistry.addAll([customer1, customer2, customer3]);
-    await partnerRegistry.addAll([partner1, partner2]);
-    await providerRegistry.addAll([provider1, provider2]);
-    await solutionProviderRegistry.add(solutionprovider1);
+    //adding the customer3 to the blockchain network
+    await customerRegistry.add(customer3);
+
+    //adding the partner2 to the blockchain network
+    await partnerRegistry.add(partner2);
+
+    //adding providers to the network
+    await providerRegistry.add(provider2);
+
+
+    // let actualProvider1 = await providerRegistry.get('Action0');
+    // let actualProvider2 = await providerRegistry.get('Praxis0');
+    // let actualPartner1 = await partnerRegistry.get('Keeskroket1');
+    // let actualPartner2 = await partnerRegistry.get('Hanscurryworst1');
+    // let actualCustomer1 = await customerRegistry.get('Henk1');
+    // let actualCustomer2 = await customerRegistry.get('Kees1');
+    // let actualCustomer3 = await customerRegistry.get('Piet1');
+
+    // //adding providers to the customers and partners
+    // actualCustomer1.providers = [actualProvider1];
+    // actualCustomer2.providers = [actualProvider1];
+    // actualCustomer3.providers = [actualProvider2];
+    // actualPartner1.provider = actualProvider1;
+    // actualPartner2.provider = actualProvider2;  
+
+    // //update customers and partners
+    // await customerRegistry.updateAll([actualCustomer1, actualCustomer2, actualCustomer3]);
+    // await partnerRegistry.updateAll([actualPartner1, actualPartner2]);
+    
+    // //adding customers and partners to the providers
+    // actualProvider1.partners = [actualPartner1];
+    // actualProvider1.customers = [actualCustomer1, actualCustomer2];
+    // actualProvider2.partners = [actualPartner2];
+    // actualProvider2.customers = [actualCustomer3];
+
+    // //update providers
+    // await providerRegistry.updateAll([actualProvider1, actualProvider2]);
 }
 
